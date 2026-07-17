@@ -31,9 +31,11 @@ Open [http://localhost:3000](http://localhost:3000) to view the arcade.
 
 The application uses the Next.js App Router. Feature code lives in `src/features`, keeping domain types, data, application logic, and UI components separate. Pages in `src/app` compose those feature modules.
 
+Games are defined in the typed registry at `src/features/games/data/games.ts`. Each entry provides its title, description, thumbnail, route, status, and leaderboard metadata so new games can be added without changing the shared game UI.
+
 ## Current games
 
-- Geometry Dash Leaderboard (coming soon)
+- Geometry Future (coming soon)
 
 ## Tech stack
 

@@ -7,6 +7,15 @@ export const games: readonly Game[] = [
     description: "A fast-paced arcade adventure is landing in Zavi Arcade soon.",
     status: "coming-soon",
     isPlaceholder: false,
+    route: "/games/geometry-future",
+    thumbnail: {
+      alt: "A glowing geometric arcade course with ramps, portals, and colourful cubes",
+      src: "/images/games/geometry-future.png",
+    },
+    leaderboard: {
+      entries: [],
+      route: "/games/geometry-future/leaderboard",
+    },
     placement: "coming-soon",
   },
   {
@@ -15,6 +24,12 @@ export const games: readonly Game[] = [
     description: "A brand-new adventure is loading into the arcade soon.",
     status: "coming-soon",
     isPlaceholder: true,
+    route: "/games/mystery-game",
+    thumbnail: null,
+    leaderboard: {
+      entries: [],
+      route: "/games/mystery-game/leaderboard",
+    },
     placement: "coming-soon",
   },
   {
@@ -23,6 +38,12 @@ export const games: readonly Game[] = [
     description: "Keep an eye on this space for another game to master.",
     status: "coming-soon",
     isPlaceholder: true,
+    route: "/games/next-challenge",
+    thumbnail: null,
+    leaderboard: {
+      entries: [],
+      route: "/games/next-challenge/leaderboard",
+    },
     placement: "coming-soon",
   },
 ];
