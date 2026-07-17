@@ -11,11 +11,11 @@ export default function Home() {
           Zavi Arcade
         </p>
         <h1 className="text-5xl font-black tracking-tight text-slate-950 sm:text-7xl">
-          Play, learn, repeat.
+          Welcome to Zavi Arcade.
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl">
-          A growing collection of games, challenges, and experiments made by
-          Zavi and family.
+          Play, learn, and repeat with a growing collection of games,
+          challenges, and experiments made by Zavi and family.
         </p>
       </section>
 
@@ -35,7 +35,7 @@ export default function Home() {
           </span>
         </div>
 
-        <div className="mt-6 grid gap-6 md:grid-cols-2">
+        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {featuredGames.map((game) => (
             <GameCard key={game.slug} game={game} />
           ))}
