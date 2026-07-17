@@ -33,6 +33,8 @@ The application uses the Next.js App Router. Feature code lives in `src/features
 
 Games are defined in the typed registry at `src/features/games/data/games.ts`. Each entry provides its title, description, thumbnail, route, status, and leaderboard metadata so new games can be added without changing the shared game UI.
 
+Scores can be submitted with `POST /api/games/:slug/scores` using JSON such as `{ "playerName": "Zavi", "score": 987650 }`. The MVP validates and acknowledges submissions; persistent storage will be added later.
+
 ## Current games
 
 - Geometry Dash (coming soon)
