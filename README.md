@@ -22,6 +22,10 @@ Open [http://localhost:3000](http://localhost:3000) to view the arcade.
 | `npm run test` | Run the unit tests. |
 | `npm run build` | Build the production application. |
 | `npm run start` | Serve a production build. |
+| `npm run build:worker` | Build the Cloudflare Worker bundle. |
+| `npm run preview` | Run the Cloudflare Worker bundle locally. |
+| `npm run deploy` | Build and deploy the Worker to Cloudflare. |
+| `npm run cf-typegen` | Generate types for Cloudflare bindings. |
 
 ## Architecture
 
@@ -38,7 +42,11 @@ The application uses the Next.js App Router. Feature code lives in `src/features
 - Tailwind CSS
 - ESLint
 - Vitest
-- Cloudflare Pages, Workers, and D1 (planned deployment and data services)
+- Cloudflare Workers and D1 (planned data service)
+
+## Deployment
+
+The application is deployed through the Cloudflare Worker project `zaviarcade`, with production deployments from `main` and preview deployments for pull requests. See the [Cloudflare Workers deployment guide](docs/deployment.md) for project settings and local deployment commands.
 
 ## Status
 
