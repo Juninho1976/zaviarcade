@@ -2,19 +2,19 @@ import type { Game } from "@/features/games/domain/game";
 
 export const games: readonly Game[] = [
   {
-    slug: "geometry-future",
-    title: "Geometry Future",
+    slug: "geometry-dash",
+    title: "Geometry Dash",
     description: "A fast-paced arcade adventure is landing in Zavi Arcade soon.",
     status: "coming-soon",
     isPlaceholder: false,
-    route: "/games/geometry-future",
+    route: "/games/geometry-dash",
     thumbnail: {
       alt: "A glowing geometric arcade course with ramps, portals, and colourful cubes",
-      src: "/images/games/geometry-future.png",
+      src: "/images/games/geometry-dash.png",
     },
     leaderboard: {
       entries: [],
-      route: "/games/geometry-future/leaderboard",
+      route: "/games/geometry-dash/leaderboard",
     },
     placement: "coming-soon",
   },

@@ -35,7 +35,7 @@ Games are defined in the typed registry at `src/features/games/data/games.ts`. E
 
 ## Current games
 
-- Geometry Future (coming soon)
+- Geometry Dash (coming soon)
 
 ## Tech stack
 

@@ -5,15 +5,15 @@ import { GameCard } from "./game-card";
 
 describe("GameCard", () => {
   it("renders a game thumbnail and links to its game route", () => {
-    const game = getGameBySlug("geometry-future");
+    const game = getGameBySlug("geometry-dash");
 
     if (!game || !game.thumbnail) {
-      throw new Error("Geometry Future must be registered");
+      throw new Error("Geometry Dash must be registered");
     }
 
     const card = renderToStaticMarkup(<GameCard game={game} />);
 
-    expect(card).toContain('href="/games/geometry-future"');
+    expect(card).toContain('href="/games/geometry-dash"');
     expect(card).toContain(encodeURIComponent(game.thumbnail.src));
     expect(card).toContain(game.thumbnail.alt);
   });
