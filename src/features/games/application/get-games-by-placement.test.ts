@@ -10,6 +10,9 @@ describe("getGamesByPlacement", () => {
         isPlaceholder: false,
         slug: "geometry-future",
         title: "Geometry Future",
+        thumbnail: expect.objectContaining({
+          src: "/images/games/geometry-future.png",
+        }),
       }),
     );
     expect(upcomingGames.filter((game) => game.isPlaceholder)).toHaveLength(2);
