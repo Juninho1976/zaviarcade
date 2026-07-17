@@ -34,7 +34,29 @@ export default async function LeaderboardPage({
         <p className="mt-6 rounded-2xl border border-dashed border-cyan-300 bg-cyan-50/50 p-6 leading-7 text-slate-600">
           Scores will appear here when {game.title} is live.
         </p>
-      ) : null}
+      ) : (
+        <div className="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <table className="w-full min-w-[500px] text-left">
+            <caption className="sr-only">{game.title} player rankings and scores</caption>
+            <thead className="border-b border-slate-200 bg-slate-50 text-sm text-slate-600">
+              <tr>
+                <th className="px-5 py-4 font-semibold" scope="col">Rank</th>
+                <th className="px-5 py-4 font-semibold" scope="col">Player</th>
+                <th className="px-5 py-4 text-right font-semibold" scope="col">Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {game.leaderboard.entries.map((entry) => (
+                <tr className="border-b border-slate-100 last:border-0" key={entry.rank}>
+                  <td className="px-5 py-4 font-bold text-cyan-800">#{entry.rank}</td>
+                  <td className="px-5 py-4 font-semibold text-slate-950">{entry.playerName}</td>
+                  <td className="px-5 py-4 text-right font-mono font-semibold text-slate-700">{entry.score.toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </main>
   );
 }
