@@ -1,0 +1,19 @@
+import { renderToStaticMarkup } from "react-dom/server";
+import { describe, expect, it } from "vitest";
+import Home from "./page";
+
+describe("Home", () => {
+  it("welcomes visitors and presents Geometry Future before future games", () => {
+    const page = renderToStaticMarkup(<Home />);
+
+    expect(page).toContain("Welcome to Zavi Arcade.");
+    expect(page).toContain(
+      "Experience designed by Zavi and built by Zavi and family.",
+    );
+    expect(page).toContain("Mystery Game");
+    expect(page).toContain("Your Next Challenge");
+    expect(page.indexOf("Geometry Future")).toBeLessThan(
+      page.indexOf("Mystery Game"),
+    );
+  });
+});
