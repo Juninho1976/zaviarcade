@@ -57,8 +57,8 @@ function getSweepTimes(position: number, delta: number, minimum: number, maximum
   return [Math.min(first, second), Math.max(first, second)];
 }
 
-export function sweptBoundsIntersect(previous: Bounds, next: Bounds, obstacle: Bounds): boolean {
-  if (boundsOverlap(previous, obstacle) || boundsOverlap(next, obstacle)) return true;
+export function sweptBoundsCollisionTime(previous: Bounds, next: Bounds, obstacle: Bounds): number | undefined {
+  if (boundsOverlap(previous, obstacle)) return 0;
 
   const expandedLeft = obstacle.x - previous.width;
   const expandedRight = obstacle.x + obstacle.width;
@@ -69,7 +69,22 @@ export function sweptBoundsIntersect(previous: Bounds, next: Bounds, obstacle: B
   const entry = Math.max(xEntry, yEntry);
   const exit = Math.min(xExit, yExit);
 
-  return entry <= exit && entry <= 1 && exit >= 0;
+  if (entry > exit || entry > 1 || exit < 0) return undefined;
+
+  return Math.max(0, entry);
+}
+
+export function sweptBoundsIntersect(previous: Bounds, next: Bounds, obstacle: Bounds): boolean {
+  return sweptBoundsCollisionTime(previous, next, obstacle) !== undefined;
+}
+
+function interpolatePlayer(previous: PlayerState, next: PlayerState, progress: number): PlayerState {
+  return {
+    x: previous.x + (next.x - previous.x) * progress,
+    y: previous.y + (next.y - previous.y) * progress,
+    velocityY: next.velocityY,
+    grounded: false,
+  };
 }
 
 function hasGroundAt(level: LevelDefinition, x: number): boolean {
@@ -131,15 +146,22 @@ function stepRunningGame(state: GameState, level: LevelDefinition, input: GameIn
   };
   const previousBounds = getPlayerBounds(previousPlayer, level);
   const nextBounds = getPlayerBounds(nextPlayer, level);
-  const obstacle = level.obstacles.find((candidate) => (
+  const collision = level.obstacles.find((candidate) => (
     candidate.kind === "spire"
       ? sweptBoundsIntersectTriangle(previousBounds, nextBounds, getSpireTriangle(candidate, level))
-      : sweptBoundsIntersect(previousBounds, nextBounds, getObstacleBounds(candidate, level))
+      : sweptBoundsCollisionTime(previousBounds, nextBounds, getObstacleBounds(candidate, level)) !== undefined
   ));
 
-  if (obstacle) {
+  if (collision) {
+    const collisionTime = collision.kind === "block"
+      ? sweptBoundsCollisionTime(previousBounds, nextBounds, getObstacleBounds(collision, level))
+      : undefined;
     return createDeadState(
-      { ...state, player: nextPlayer, elapsedSeconds: state.elapsedSeconds + FIXED_TIME_STEP_SECONDS },
+      {
+        ...state,
+        player: collisionTime === undefined ? nextPlayer : interpolatePlayer(previousPlayer, nextPlayer, collisionTime),
+        elapsedSeconds: state.elapsedSeconds + FIXED_TIME_STEP_SECONDS,
+      },
       level,
       "obstacle",
     );
