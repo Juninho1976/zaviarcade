@@ -39,6 +39,20 @@ test.describe("Zavi Dash player journey", () => {
     await expect(page.locator("#zavi-dash-status")).toContainText("running");
   });
 
+  test("clears the opening spike and reduced introductory cube with reasonable timing", async ({ page }) => {
+    await page.goto("/games/zavi-dash?e2e=opening-section");
+    const canvas = page.getByRole("img", { name: /Zavi Dash game canvas/i });
+    await canvas.click();
+
+    await page.waitForTimeout(1_500);
+    await canvas.click();
+    await page.waitForTimeout(1_450);
+    await canvas.click();
+    await page.waitForTimeout(1_000);
+
+    await expect(page.locator("#zavi-dash-status")).toContainText("running");
+  });
+
   test("completes a run, submits once, and opens the leaderboard", async ({ page }) => {
     await page.route("**/api/games/zavi-dash/scores", async (route) => {
       await route.fulfill({

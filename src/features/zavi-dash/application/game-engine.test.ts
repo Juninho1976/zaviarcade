@@ -3,7 +3,7 @@ import { getMaximumScore } from "@/features/zavi-dash/application/get-maximum-sc
 import { zaviDashLevelOne } from "@/features/zavi-dash/data/zavi-dash-level-one";
 import type { GameInput, GameState } from "@/features/zavi-dash/domain/game";
 import type { LevelDefinition } from "@/features/zavi-dash/domain/level";
-import { createInitialGameState, stepGame } from "./game-engine";
+import { createInitialGameState, stepGame, sweptBoundsCollisionTime } from "./game-engine";
 
 function runSteps(state: GameState, level: LevelDefinition, steps: number, input: GameInput = {}): GameState {
   let nextState = state;
@@ -73,6 +73,30 @@ describe("Zavi Dash game engine", () => {
     const state = stepGame(createInitialGameState(level), level, { startPressed: true });
 
     expect(state).toMatchObject({ phase: "dead", deathReason: "obstacle" });
+  });
+
+  it("allows a cube near-miss but renders a genuine cube collision at the visible contact edge", () => {
+    const cube = { x: 400, y: 350, width: 96, height: 80 };
+    const nearMiss = sweptBoundsCollisionTime(
+      { x: 300, y: 250, width: 52, height: 52 },
+      { x: 350, y: 295, width: 52, height: 52 },
+      cube,
+    );
+    const contact = sweptBoundsCollisionTime(
+      { x: 300, y: 250, width: 52, height: 52 },
+      { x: 350, y: 298, width: 52, height: 52 },
+      cube,
+    );
+    const level = createFlatLevel({
+      physics: { ...zaviDashLevelOne.physics, runSpeed: 60_000 },
+      obstacles: [{ id: "fast-block", kind: "block", x: 400, width: 60, height: 80 }],
+    });
+    const state = stepGame(createInitialGameState(level), level, { startPressed: true });
+
+    expect(nearMiss).toBeUndefined();
+    expect(contact).toBe(1);
+    expect(state).toMatchObject({ phase: "dead", deathReason: "obstacle" });
+    expect(state.player.x + level.player.width).toBeCloseTo(400);
   });
 
   it("kills the player after falling through a gap", () => {

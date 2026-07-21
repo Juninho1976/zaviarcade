@@ -7,6 +7,10 @@ describe("browser test levels", () => {
     expect(getBrowserTestLevel("death")?.obstacles).toHaveLength(1);
     expect(getBrowserTestLevel("running")?.finishX).toBe(4_000);
     expect(getBrowserTestLevel("spire-near-miss")?.obstacles[0]?.kind).toBe("spire");
+    expect(getBrowserTestLevel("opening-section")?.obstacles.map((obstacle) => obstacle.id)).toEqual([
+      "first-spire",
+      "paired-blocks",
+    ]);
     expect(getBrowserTestLevel("unknown")).toBeUndefined();
   });
 });

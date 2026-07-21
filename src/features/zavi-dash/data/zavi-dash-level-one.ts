@@ -32,7 +32,7 @@ export const zaviDashLevelOne: LevelDefinition = {
   ],
   obstacles: [
     { id: "first-spire", kind: "spire", x: 760, width: 76, height: 84 },
-    { id: "paired-blocks", kind: "block", x: 1_180, width: 96, height: 72 },
+    { id: "paired-blocks", kind: "block", x: 1_180, width: 96, height: 56 },
     { id: "ridge-spire", kind: "spire", x: 2_250, width: 92, height: 116 },
     { id: "high-block", kind: "block", x: 2_790, width: 120, height: 104 },
     { id: "twin-spires", kind: "spire", x: 4_160, width: 136, height: 94 },

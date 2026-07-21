@@ -1,7 +1,7 @@
 import type { LevelDefinition } from "@/features/zavi-dash/domain/level";
 import { zaviDashLevelOne } from "./zavi-dash-level-one";
 
-type BrowserTestScenario = "complete" | "death" | "running" | "spire-near-miss";
+type BrowserTestScenario = "complete" | "death" | "opening-section" | "running" | "spire-near-miss";
 type BrowserTestLevelOverrides = Pick<LevelDefinition, "finishX" | "obstacles" | "terrain" | "world"> &
   Partial<Pick<LevelDefinition, "physics">>;
 
@@ -47,10 +47,22 @@ const browserTestLevels: Record<BrowserTestScenario, LevelDefinition> = {
     terrain: [{ startX: 0, endX: 3_200 }],
     world: { width: 3_200, height: 540 },
   }),
+  "opening-section": createBrowserTestLevel("browser-opening-section", {
+    finishX: 3_000,
+    obstacles: zaviDashLevelOne.obstacles.slice(0, 2),
+    terrain: [{ startX: 0, endX: 3_200 }],
+    world: { width: 3_200, height: 540 },
+  }),
 };
 
 export function getBrowserTestLevel(scenario: string | undefined): LevelDefinition | undefined {
-  if (scenario !== "complete" && scenario !== "death" && scenario !== "running" && scenario !== "spire-near-miss") return undefined;
+  if (
+    scenario !== "complete" &&
+    scenario !== "death" &&
+    scenario !== "opening-section" &&
+    scenario !== "running" &&
+    scenario !== "spire-near-miss"
+  ) return undefined;
 
   return browserTestLevels[scenario];
 }
