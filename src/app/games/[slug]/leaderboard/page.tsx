@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { getGameByLegacySlug } from "@/features/games/application/get-game-by-legacy-slug";
 import { getGameBySlug } from "@/features/games/application/get-game-by-slug";
 import { getLeaderboard } from "@/features/games/application/get-leaderboard";
 import { games } from "@/features/games/data/games";
@@ -19,6 +20,12 @@ export default async function LeaderboardPage({
   const game = getGameBySlug(slug);
 
   if (!game) {
+    const legacyGame = getGameByLegacySlug(slug);
+
+    if (legacyGame) {
+      permanentRedirect(legacyGame.leaderboard.route);
+    }
+
     notFound();
   }
   const { env } = await getCloudflareContext({ async: true });

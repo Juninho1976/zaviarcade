@@ -37,7 +37,7 @@ Games are defined in the typed registry at `src/features/games/data/games.ts`. E
 
 Scores can be submitted with `POST /api/games/:slug/scores` using JSON such as `{ "playerName": "Zavi", "score": 987650 }`. Valid submissions are persisted to D1 and return the saved score ID.
 
-The Geometry Dash leaderboard reads live score rows from D1 and ranks them by descending score.
+The Zavi Dash leaderboard reads live score rows from D1 and ranks them by descending score.
 The global `/leaderboards` page lists the available game leaderboards from the game registry.
 
 ## Database
@@ -46,7 +46,7 @@ Cloudflare D1 is bound to the Worker as `DB`. Version-controlled SQL migrations 
 
 ## Current games
 
-- Geometry Dash (coming soon)
+- Zavi Dash (coming soon)
 
 ## Tech stack
 

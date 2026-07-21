@@ -2,19 +2,20 @@ import type { Game } from "@/features/games/domain/game";
 
 export const games: readonly Game[] = [
   {
-    slug: "geometry-dash",
-    title: "Geometry Dash",
-    description: "A fast-paced arcade adventure is landing in Zavi Arcade soon.",
+    slug: "zavi-dash",
+    title: "Zavi Dash",
+    description: "An original obstacle run made for fast reflexes and fresh starts.",
     status: "coming-soon",
     isPlaceholder: false,
-    route: "/games/geometry-dash",
+    legacySlugs: ["geometry-dash"],
+    route: "/games/zavi-dash",
     thumbnail: {
-      alt: "A glowing geometric arcade course with ramps, portals, and colourful cubes",
-      src: "/images/games/geometry-dash.png",
+      alt: "An original Zavi Dash course with a bright player block, ramps, and a finish flag",
+      src: "/images/games/zavi-dash.svg",
     },
     leaderboard: {
       entries: [],
-      route: "/games/geometry-dash/leaderboard",
+      route: "/games/zavi-dash/leaderboard",
     },
     placement: "coming-soon",
   },
@@ -24,6 +25,7 @@ export const games: readonly Game[] = [
     description: "A brand-new adventure is loading into the arcade soon.",
     status: "coming-soon",
     isPlaceholder: true,
+    legacySlugs: [],
     route: "/games/mystery-game",
     thumbnail: null,
     leaderboard: {
@@ -38,6 +40,7 @@ export const games: readonly Game[] = [
     description: "Keep an eye on this space for another game to master.",
     status: "coming-soon",
     isPlaceholder: true,
+    legacySlugs: [],
     route: "/games/next-challenge",
     thumbnail: null,
     leaderboard: {

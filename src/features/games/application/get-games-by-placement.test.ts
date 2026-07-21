@@ -2,16 +2,16 @@ import { describe, expect, it } from "vitest";
 import { getGamesByPlacement } from "./get-games-by-placement";
 
 describe("getGamesByPlacement", () => {
-  it("returns Geometry Dash first in the coming-soon collection", () => {
+  it("returns Zavi Dash first in the coming-soon collection", () => {
     const upcomingGames = getGamesByPlacement("coming-soon");
 
     expect(upcomingGames[0]).toEqual(
       expect.objectContaining({
         isPlaceholder: false,
-        slug: "geometry-dash",
-        title: "Geometry Dash",
+        slug: "zavi-dash",
+        title: "Zavi Dash",
         thumbnail: expect.objectContaining({
-          src: "/images/games/geometry-dash.png",
+          src: "/images/games/zavi-dash.svg",
         }),
       }),
     );

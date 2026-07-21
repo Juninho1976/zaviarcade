@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -19,17 +19,21 @@ async function applyMigration(path: string) {
 
 beforeAll(async () => {
   proxy = await getPlatformProxy<{ DB: D1Database }>({ configPath: "wrangler.jsonc", persist: { path: await mkdtemp(join(tmpdir(), "zaviarcade-d1-")) } });
-  await applyMigration("migrations/0001_initial_schema.sql");
-  await applyMigration("migrations/0002_seed_geometry_dash.sql");
+  for (const migration of readdirSync("migrations").sort()) {
+    await applyMigration(`migrations/${migration}`);
+  }
 });
 afterAll(async () => proxy.dispose());
 
 describe("local D1 score submission", () => {
   it("persists a submitted score and returns it through the leaderboard", async () => {
-    const result = await processScoreSubmission(proxy.env.DB, "geometry-dash", { playerName: "Zavi", score: 987_650 });
+    const game = await proxy.env.DB.prepare("SELECT id, slug, name FROM games").first<{ id: number; name: string; slug: string }>();
+    expect(game).toEqual({ id: 1, name: "Zavi Dash", slug: "zavi-dash" });
+
+    const result = await processScoreSubmission(proxy.env.DB, "zavi-dash", { playerName: "Zavi", score: 987_650 });
     expect(result).toMatchObject({ success: true, status: 201 });
     if (!result.success) throw new Error(result.message);
-    const leaderboard = await getLeaderboard(proxy.env.DB, "geometry-dash");
+    const leaderboard = await getLeaderboard(proxy.env.DB, "zavi-dash");
     expect(leaderboard).toContainEqual({ playerName: "Zavi", rank: 1, score: 987_650 });
     const stored = await proxy.env.DB.prepare("SELECT id FROM scores WHERE id = ?").bind(result.scoreId).first<{ id: number }>();
     expect(stored?.id).toBe(result.scoreId);

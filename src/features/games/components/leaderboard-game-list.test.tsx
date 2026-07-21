@@ -9,7 +9,7 @@ describe("LeaderboardGameList", () => {
       <LeaderboardGameList games={getGamesWithLeaderboards()} />,
     );
 
-    expect(list).toContain("Geometry Dash");
-    expect(list).toContain('href="/games/geometry-dash/leaderboard"');
+    expect(list).toContain("Zavi Dash");
+    expect(list).toContain('href="/games/zavi-dash/leaderboard"');
   });
 });

@@ -32,3 +32,19 @@ To regenerate Cloudflare binding types after adding a binding, run:
 ```bash
 npm run cf-typegen
 ```
+
+## Applying the Zavi Dash rename migration
+
+Migration `0003_rename_geometry_dash_to_zavi_dash.sql` updates the existing game row in place, preserving its database ID and any related score rows. Run it locally before verifying the renamed routes:
+
+```bash
+npm run db:migrate:local
+```
+
+After the rename PR has been merged and its Worker deployment is available, apply the same migration to production as part of the release:
+
+```bash
+npm run db:migrate:remote
+```
+
+Run the remote migration promptly after deployment so the canonical `zavi-dash` application route and D1 record stay aligned.
