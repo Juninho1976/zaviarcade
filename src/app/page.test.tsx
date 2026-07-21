@@ -10,6 +10,7 @@ describe("Home", () => {
     expect(page).toContain(
       "Experience designed by Zavi and built by Zavi and family.",
     );
+    expect(page).toContain("Ready to play");
     expect(page).toContain("Mystery Game");
     expect(page).toContain("Your Next Challenge");
     expect(page.indexOf("Zavi Dash")).toBeLessThan(

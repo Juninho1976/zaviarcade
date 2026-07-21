@@ -13,6 +13,8 @@ import { renderZaviDashGame } from "./render-zavi-dash-game";
 type ZaviDashCanvasProps = {
   debug?: boolean;
   level?: LevelDefinition;
+  onGameStateChange?: (state: GameState) => void;
+  restartRequest?: number;
 };
 
 function mergeInput(current: GameInput, next: GameInput): GameInput {
@@ -23,16 +25,34 @@ function mergeInput(current: GameInput, next: GameInput): GameInput {
   };
 }
 
-export function ZaviDashCanvas({ debug = false, level = zaviDashLevelOne }: ZaviDashCanvasProps) {
+export function ZaviDashCanvas({
+  debug = false,
+  level = zaviDashLevelOne,
+  onGameStateChange,
+  restartRequest = 0,
+}: ZaviDashCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineStateRef = useRef<GameState>(createInitialGameState(level));
   const pendingInputRef = useRef<GameInput>({});
+  const onGameStateChangeRef = useRef(onGameStateChange);
+  const restartRequestRef = useRef(restartRequest);
   const [presentation, setPresentation] = useState<GameState>(() => createInitialGameState(level));
   const debugEnabled = isDebugOverlayEnabled({ explicitFlag: debug });
 
   function queueInput(input: GameInput): void {
     pendingInputRef.current = mergeInput(pendingInputRef.current, input);
   }
+
+  useEffect(() => {
+    onGameStateChangeRef.current = onGameStateChange;
+  }, [onGameStateChange]);
+
+  useEffect(() => {
+    if (restartRequest === restartRequestRef.current) return;
+
+    restartRequestRef.current = restartRequest;
+    queueInput({ restartPressed: true });
+  }, [restartRequest]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -89,6 +109,7 @@ export function ZaviDashCanvas({ debug = false, level = zaviDashLevelOne }: Zavi
       const frame = renderZaviDashGame(context, level, engineStateRef.current);
       if (debugEnabled) renderDebugOverlay(context, level, engineStateRef.current, frame, framesPerSecond);
       setPresentation(engineStateRef.current);
+      onGameStateChangeRef.current?.(engineStateRef.current);
       animationFrame = requestAnimationFrame(render);
     };
 

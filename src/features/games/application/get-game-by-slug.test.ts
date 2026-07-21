@@ -6,7 +6,8 @@ describe("getGameBySlug", () => {
     expect(getGameBySlug("zavi-dash")).toEqual(
       expect.objectContaining({
         route: "/games/zavi-dash",
-        status: "coming-soon",
+        status: "live",
+        placement: "available",
         thumbnail: expect.objectContaining({
           src: "/images/games/zavi-dash.svg",
         }),
