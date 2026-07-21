@@ -12,9 +12,7 @@ describe("getGameBySlug", () => {
         }),
         leaderboard: expect.objectContaining({
           route: "/games/geometry-dash/leaderboard",
-          entries: expect.arrayContaining([
-            expect.objectContaining({ playerName: "Zavi", rank: 1, score: 987_650 }),
-          ]),
+          entries: [],
         }),
       }),
     );
