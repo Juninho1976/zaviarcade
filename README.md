@@ -37,6 +37,8 @@ Games are defined in the typed registry at `src/features/games/data/games.ts`. E
 
 Zavi Dash Level One is defined as typed, framework-independent course and visual-token data in `src/features/zavi-dash`. Its fixed-timestep game engine is also pure TypeScript, keeping future level content, simulation, and Canvas rendering separate.
 
+The reusable `ZaviDashCanvas` client component renders the game and supports keyboard, mouse, touch, and visible controls. Its diagnostic overlay is enabled in development, or in production only when the component receives an explicit `debug` flag.
+
 Scores can be submitted with `POST /api/games/:slug/scores` using JSON such as `{ "playerName": "Zavi", "score": 987650 }`. Valid submissions are persisted to D1 and return the saved score ID.
 
 The Zavi Dash leaderboard reads live score rows from D1 and ranks them by descending score.
