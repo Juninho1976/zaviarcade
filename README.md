@@ -56,10 +56,11 @@ npm run test
 Run browser coverage for keyboard, pointer/touch, death, restart, completion, score-submission UI, and leaderboard navigation with:
 
 ```bash
+npx playwright install chromium
 npm run test:browser
 ```
 
-The Playwright command starts its own local development server. Its short deterministic game scenarios are enabled only for that test server and are never available in production builds.
+Install Chromium once after adding dependencies; Playwright’s browser binary is not committed to the repository. The test command starts its own local development server. Its short deterministic game scenarios are enabled only for that test server and are never available in production builds.
 
 ## Database
 

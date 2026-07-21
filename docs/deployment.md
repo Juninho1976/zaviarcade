@@ -38,6 +38,7 @@ npm run db:migrate:local
 Run the automated browser journey checks (desktop and mobile) with:
 
 ```bash
+npx playwright install chromium
 npm run test:browser
 ```
 
