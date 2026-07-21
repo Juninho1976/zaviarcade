@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title description">
+  <title id="title">Zavi Dash original game course</title>
+  <desc id="description">A bright cyan player block dashes across a midnight course of original orange ramps and violet obstacles toward a yellow finish flag.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#312e81"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" x2="1">
+      <stop stop-color="#0891b2"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#sky)"/>
+  <circle cx="960" cy="132" r="68" fill="#fef08a" opacity=".9"/>
+  <path d="M0 495h1200v180H0z" fill="url(#ground)"/>
+  <path d="M0 495h1200" fill="none" stroke="#cffafe" stroke-width="10"/>
+  <path d="M360 495l100-135 100 135zM650 495l75-105 75 105z" fill="#fb923c"/>
+  <rect x="150" y="395" width="86" height="86" rx="14" fill="#67e8f9" stroke="#ecfeff" stroke-width="12"/>
+  <path d="M177 440h32" stroke="#0f172a" stroke-linecap="round" stroke-width="10"/>
+  <path d="M825 495V248" stroke="#f8fafc" stroke-width="14"/>
+  <path d="M832 254h152l-46 72 46 72H832z" fill="#facc15"/>
+  <text x="72" y="120" fill="#ecfeff" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="800" letter-spacing="8">ZAVI DASH</text>
+</svg>

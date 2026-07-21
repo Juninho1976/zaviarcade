@@ -20,6 +20,7 @@ export type GameThumbnail = {
 export type Game = {
   description: string;
   isPlaceholder: boolean;
+  legacySlugs: readonly string[];
   leaderboard: GameLeaderboard;
   placement: GamePlacement;
   route: string;

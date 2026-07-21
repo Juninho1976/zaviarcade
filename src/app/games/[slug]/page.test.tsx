@@ -3,13 +3,13 @@ import { describe, expect, it } from "vitest";
 import GamePage from "./page";
 
 describe("GamePage", () => {
-  it("renders the Geometry Dash play placeholder and leaderboard section", async () => {
+  it("renders the Zavi Dash play placeholder and leaderboard section", async () => {
     const page = await GamePage({
-      params: Promise.resolve({ slug: "geometry-dash" }),
+      params: Promise.resolve({ slug: "zavi-dash" }),
     });
     const markup = renderToStaticMarkup(page);
 
-    expect(markup).toContain("Geometry Dash");
+    expect(markup).toContain("Zavi Dash");
     expect(markup).toContain("Play (coming soon)");
     expect(markup).toContain("Leaderboard");
   });

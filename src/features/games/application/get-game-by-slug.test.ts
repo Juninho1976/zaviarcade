@@ -2,16 +2,16 @@ import { describe, expect, it } from "vitest";
 import { getGameBySlug } from "./get-game-by-slug";
 
 describe("getGameBySlug", () => {
-  it("returns Geometry Dash with its route, thumbnail, and leaderboard", () => {
-    expect(getGameBySlug("geometry-dash")).toEqual(
+  it("returns Zavi Dash with its route, thumbnail, and leaderboard", () => {
+    expect(getGameBySlug("zavi-dash")).toEqual(
       expect.objectContaining({
-        route: "/games/geometry-dash",
+        route: "/games/zavi-dash",
         status: "coming-soon",
         thumbnail: expect.objectContaining({
-          src: "/images/games/geometry-dash.png",
+          src: "/images/games/zavi-dash.svg",
         }),
         leaderboard: expect.objectContaining({
-          route: "/games/geometry-dash/leaderboard",
+          route: "/games/zavi-dash/leaderboard",
           entries: [],
         }),
       }),

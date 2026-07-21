@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
+import { getGameByLegacySlug } from "@/features/games/application/get-game-by-legacy-slug";
 import { getGameBySlug } from "@/features/games/application/get-game-by-slug";
 import { games } from "@/features/games/data/games";
 
@@ -17,6 +18,12 @@ export default async function GamePage({
   const game = getGameBySlug(slug);
 
   if (!game) {
+    const legacyGame = getGameByLegacySlug(slug);
+
+    if (legacyGame) {
+      permanentRedirect(legacyGame.route);
+    }
+
     notFound();
   }
 
@@ -58,7 +65,7 @@ export default async function GamePage({
       <section className="mt-14 rounded-3xl border border-slate-200 bg-white p-8" aria-labelledby="leaderboard-heading">
         <p className="text-sm font-semibold tracking-[0.2em] text-cyan-700 uppercase">Leaderboard</p>
         <h2 id="leaderboard-heading" className="mt-2 text-3xl font-bold text-slate-950">Ready when the game is live</h2>
-        <p className="mt-3 leading-7 text-slate-600">Scores will appear here once players can start their Geometry Dash runs.</p>
+        <p className="mt-3 leading-7 text-slate-600">Scores will appear here once players can start their {game.title} runs.</p>
       </section>
     </main>
   );

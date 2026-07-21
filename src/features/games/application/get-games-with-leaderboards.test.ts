@@ -4,7 +4,7 @@ import { getGamesWithLeaderboards } from "./get-games-with-leaderboards";
 describe("getGamesWithLeaderboards", () => {
   it("returns registered games with public leaderboards, excluding future placeholders", () => {
     expect(getGamesWithLeaderboards().map((game) => game.slug)).toEqual([
-      "geometry-dash",
+      "zavi-dash",
     ]);
   });
 });
