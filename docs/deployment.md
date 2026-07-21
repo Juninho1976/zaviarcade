@@ -48,3 +48,9 @@ npm run db:migrate:remote
 ```
 
 Run the remote migration promptly after deployment so the canonical `zavi-dash` application route and D1 record stay aligned.
+
+## Score-submission rate limiting
+
+The Worker configuration declares the `SCORE_SUBMISSION_LIMITER` rate-limit binding. It allows at most 10 score submissions per minute for each client-address key on `POST /api/games/:slug/scores`; the endpoint returns HTTP `429` when the limit is reached.
+
+The binding's namespace ID (`31`) is reserved for Zavi Arcade score submissions. Keep it unique within the Cloudflare account: do not reuse it for another rate-limit binding unless the counters are intentionally shared. Wrangler applies this configuration on the next Worker deployment. The limit is a basic abuse safeguard only; it is not a replacement for server-authoritative run verification, which remains deferred.

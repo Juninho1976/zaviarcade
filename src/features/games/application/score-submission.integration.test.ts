@@ -30,12 +30,20 @@ describe("local D1 score submission", () => {
     const game = await proxy.env.DB.prepare("SELECT id, slug, name FROM games").first<{ id: number; name: string; slug: string }>();
     expect(game).toEqual({ id: 1, name: "Zavi Dash", slug: "zavi-dash" });
 
-    const result = await processScoreSubmission(proxy.env.DB, "zavi-dash", { playerName: "Zavi", score: 987_650 });
+    const result = await processScoreSubmission(proxy.env.DB, "zavi-dash", { playerName: "Zavi", score: 1_086 });
     expect(result).toMatchObject({ success: true, status: 201 });
     if (!result.success) throw new Error(result.message);
     const leaderboard = await getLeaderboard(proxy.env.DB, "zavi-dash");
-    expect(leaderboard).toContainEqual({ playerName: "Zavi", rank: 1, score: 987_650 });
+    expect(leaderboard).toContainEqual({ playerName: "Zavi", rank: 1, score: 1_086 });
     const stored = await proxy.env.DB.prepare("SELECT id FROM scores WHERE id = ?").bind(result.scoreId).first<{ id: number }>();
     expect(stored?.id).toBe(result.scoreId);
+  });
+
+  it("reuses the normalized player record for later submissions", async () => {
+    await expect(processScoreSubmission(proxy.env.DB, "zavi-dash", { playerName: "Zavi Family", score: 100 })).resolves.toMatchObject({ success: true, status: 201 });
+    await expect(processScoreSubmission(proxy.env.DB, "zavi-dash", { playerName: " Zavi Family ", score: 200 })).resolves.toMatchObject({ success: true, status: 201 });
+    const players = await proxy.env.DB.prepare("SELECT id FROM players WHERE display_name = ?").bind("Zavi Family").all<{ id: number }>();
+
+    expect(players.results).toHaveLength(1);
   });
 });

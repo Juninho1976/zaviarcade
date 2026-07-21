@@ -19,5 +19,15 @@
 			"database_name": "zaviarcade-db",
 			"database_id": "cad7ef7e-59bf-432d-abfe-f5a4c21a0876"
 		}
+	],
+	"ratelimits": [
+		{
+			"name": "SCORE_SUBMISSION_LIMITER",
+			"namespace_id": "31",
+			"simple": {
+				"limit": 10,
+				"period": 60
+			}
+		}
 	]
 }

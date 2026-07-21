@@ -4,6 +4,11 @@ import { useState } from "react";
 import { createInitialGameState } from "@/features/zavi-dash/application/game-engine";
 import { zaviDashLevelOne } from "@/features/zavi-dash/data/zavi-dash-level-one";
 import type { GameState } from "@/features/zavi-dash/domain/game";
+import {
+  canSubmitCompletedRun,
+  submitCompletedZaviDashScore,
+  type ScoreSubmissionUiState,
+} from "@/features/zavi-dash/application/score-submission-client";
 import { ZaviDashCanvas } from "./zavi-dash-canvas";
 import { ZaviDashRunSummary } from "./zavi-dash-run-summary";
 
@@ -11,11 +16,28 @@ export function ZaviDashGame() {
   const [gameState, setGameState] = useState<GameState>(() => createInitialGameState(zaviDashLevelOne));
   const [playerName, setPlayerName] = useState("");
   const [restartRequest, setRestartRequest] = useState(0);
+  const [submission, setSubmission] = useState<ScoreSubmissionUiState>({ status: "idle" });
   const progressPercent = Math.round(gameState.progress * 100);
 
   function restartRun(): void {
     setGameState(createInitialGameState(zaviDashLevelOne));
+    setSubmission({ status: "idle" });
     setRestartRequest((request) => request + 1);
+  }
+
+  async function submitScore(): Promise<void> {
+    if (!canSubmitCompletedRun(gameState, submission)) return;
+
+    setSubmission({ status: "pending" });
+    try {
+      const scoreId = await submitCompletedZaviDashScore(playerName, gameState.score);
+      setSubmission({ status: "success", scoreId });
+    } catch (error) {
+      setSubmission({
+        status: "error",
+        message: error instanceof Error ? error.message : "Your score could not be saved. Please try again.",
+      });
+    }
   }
 
   return (
@@ -51,8 +73,10 @@ export function ZaviDashGame() {
       <ZaviDashRunSummary
         onPlayerNameChange={setPlayerName}
         onRestart={restartRun}
+        onSubmit={submitScore}
         playerName={playerName}
         state={gameState}
+        submission={submission}
       />
     </section>
   );
