@@ -35,7 +35,7 @@ The application uses the Next.js App Router. Feature code lives in `src/features
 
 Games are defined in the typed registry at `src/features/games/data/games.ts`. Each entry provides its title, description, thumbnail, route, status, and leaderboard metadata so new games can be added without changing the shared game UI.
 
-Zavi Dash Level One is defined as typed, framework-independent course and visual-token data in `src/features/zavi-dash`. This keeps future level content separate from the game engine and Canvas renderer.
+Zavi Dash Level One is defined as typed, framework-independent course and visual-token data in `src/features/zavi-dash`. Its fixed-timestep game engine is also pure TypeScript, keeping future level content, simulation, and Canvas rendering separate.
 
 Scores can be submitted with `POST /api/games/:slug/scores` using JSON such as `{ "playerName": "Zavi", "score": 987650 }`. Valid submissions are persisted to D1 and return the saved score ID.
 
