@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "test:browser": "playwright test",
     "build:worker": "opennextjs-cloudflare build",
     "preview": "npm run build:worker && wrangler dev",
     "deploy": "npm run build:worker && wrangler deploy",
@@ -22,6 +23,7 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

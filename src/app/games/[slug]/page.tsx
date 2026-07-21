@@ -4,6 +4,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { getGameByLegacySlug } from "@/features/games/application/get-game-by-legacy-slug";
 import { getGameBySlug } from "@/features/games/application/get-game-by-slug";
 import { games } from "@/features/games/data/games";
+import { getBrowserTestLevel } from "@/features/zavi-dash/data/zavi-dash-browser-test-levels";
 import { ZaviDashGame } from "@/features/zavi-dash/components/zavi-dash-game";
 
 export function generateStaticParams() {
@@ -12,10 +13,13 @@ export function generateStaticParams() {
 
 export default async function GamePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ e2e?: string }>;
 }) {
   const { slug } = await params;
+  const { e2e } = await searchParams;
   const game = getGameBySlug(slug);
 
   if (!game) {
@@ -29,6 +33,8 @@ export default async function GamePage({
   }
 
   if (game.slug === "zavi-dash") {
+    const browserTestLevel = process.env.ZAVI_ARCADE_E2E === "1" ? getBrowserTestLevel(e2e) : undefined;
+
     return (
       <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-6 py-12 sm:px-10 lg:py-20">
         <section className="max-w-3xl">
@@ -36,7 +42,7 @@ export default async function GamePage({
           <h1 className="mt-3 text-5xl font-black tracking-tight text-slate-950 sm:text-6xl">{game.title}</h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">{game.description}</p>
         </section>
-        <ZaviDashGame />
+        <ZaviDashGame level={browserTestLevel} />
       </main>
     );
   }

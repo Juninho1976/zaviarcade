@@ -6,6 +6,7 @@ describe("GamePage", () => {
   it("renders the playable Zavi Dash run flow", async () => {
     const page = await GamePage({
       params: Promise.resolve({ slug: "zavi-dash" }),
+      searchParams: Promise.resolve({}),
     });
     const markup = renderToStaticMarkup(page);
 

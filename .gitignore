@@ -12,6 +12,8 @@
 
 # testing
 /coverage
+/playwright-report/
+/test-results/
 
 # next.js
 /.next/
@@ -36,6 +38,7 @@ yarn-error.log*
 
 # Cloudflare Workers build output
 /.open-next/
+/.wrangler/
 
 # vercel
 .vercel
