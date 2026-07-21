@@ -1,4 +1,3 @@
-import { getGameBySlug } from "./get-game-by-slug";
 
 export type ScoreSubmission = { playerName: string; score: number };
 export type ScoreSubmissionResult =
@@ -6,7 +5,6 @@ export type ScoreSubmissionResult =
   | { success: false; message: string };
 
 export function submitScore(slug: string, input: unknown): ScoreSubmissionResult {
-  if (!getGameBySlug(slug)) return { success: false, message: "Game not found." };
   if (!input || typeof input !== "object") return { success: false, message: "Request body must be an object." };
   const { playerName, score } = input as Record<string, unknown>;
   if (typeof playerName !== "string" || playerName.trim().length < 1 || playerName.trim().length > 24)
