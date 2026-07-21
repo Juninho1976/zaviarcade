@@ -39,7 +39,7 @@ Zavi Dash Level One is defined as typed, framework-independent course and visual
 
 The reusable `ZaviDashCanvas` client component renders the game and supports keyboard, mouse, touch, and visible controls. Its diagnostic overlay is enabled in development, or in production only when the component receives an explicit `debug` flag. The live Zavi Dash page adds the run HUD and player-name collection; score submission is handled separately by the score API flow.
 
-Scores can be submitted with `POST /api/games/:slug/scores` using JSON such as `{ "playerName": "Zavi", "score": 987650 }`. Valid submissions are persisted to D1 and return the saved score ID.
+Scores can be submitted with `POST /api/games/:slug/scores` using JSON such as `{ "playerName": "Zavi", "score": 1086 }`. The API normalizes player names, validates whole-number scores against the level maximum, persists valid submissions to D1, and returns the saved score ID. The live game only enables submission after a completed run and prevents ordinary duplicate clicks, but client-generated scores are not cheat-proof; server-authoritative verification, authenticated players, and stronger anti-cheat controls are deferred.
 
 The Zavi Dash leaderboard reads live score rows from D1 and ranks them by descending score.
 The global `/leaderboards` page lists the available game leaderboards from the game registry.
