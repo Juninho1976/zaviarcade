@@ -13,11 +13,19 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
   const { slug } = await params;
   const requestBody = await readScoreSubmissionRequest(request);
   if (!requestBody.success) return NextResponse.json({ error: requestBody.message }, { status: requestBody.status });
-  const { env } = await getCloudflareContext({ async: true });
-  const result = await processScoreSubmission(env.DB, slug, requestBody.body, {
-    rateLimitKey: getRateLimitKey(request),
-    rateLimiter: env.SCORE_SUBMISSION_LIMITER,
-  });
-  if (!result.success) return NextResponse.json({ error: result.message }, { status: result.status });
-  return NextResponse.json({ message: "Score persisted.", score: result.score, scoreId: result.scoreId }, { status: result.status });
+  try {
+    const { env } = await getCloudflareContext({ async: true });
+    const result = await processScoreSubmission(env.DB, slug, requestBody.body, {
+      rateLimitKey: getRateLimitKey(request),
+      rateLimiter: env.SCORE_SUBMISSION_LIMITER,
+    });
+    if (!result.success) return NextResponse.json({ error: result.message }, { status: result.status });
+    return NextResponse.json({ message: "Score persisted.", score: result.score, scoreId: result.scoreId }, { status: result.status });
+  } catch (error) {
+    console.error("Score submission failed", {
+      slug,
+      message: error instanceof Error ? error.message : "Unknown server submission error",
+    });
+    return NextResponse.json({ error: "The score service is unavailable. Please try again." }, { status: 500 });
+  }
 }

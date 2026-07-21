@@ -1,4 +1,5 @@
 import { getMaximumScore } from "@/features/zavi-dash/application/get-maximum-score";
+import { getJumpCapabilities } from "@/features/zavi-dash/application/get-jump-capabilities";
 import type { LevelDefinition, LevelValidationError } from "@/features/zavi-dash/domain/level";
 
 function hasGroundAt(level: LevelDefinition, x: number): boolean {
@@ -7,6 +8,7 @@ function hasGroundAt(level: LevelDefinition, x: number): boolean {
 
 export function validateLevelDefinition(level: LevelDefinition): readonly LevelValidationError[] {
   const errors: LevelValidationError[] = [];
+  const jumpCapabilities = getJumpCapabilities(level);
 
   if (!level.id.trim()) errors.push({ path: "id", message: "A level ID is required." });
   if (!level.name.trim()) errors.push({ path: "name", message: "A level name is required." });
@@ -28,6 +30,11 @@ export function validateLevelDefinition(level: LevelDefinition): readonly LevelV
     if (segment.startX < previousEnd)
       errors.push({ path: `terrain.${index}`, message: "Ground segments must not overlap." });
     previousEnd = Math.max(previousEnd, segment.endX);
+
+    const nextSegment = level.terrain[index + 1];
+    if (nextSegment && nextSegment.startX - segment.endX > jumpCapabilities.safeGap) {
+      errors.push({ path: `terrain.${index}`, message: `Ground gaps must not exceed the safe jump distance of ${jumpCapabilities.safeGap}px.` });
+    }
   }
 
   if (!hasGroundAt(level, level.player.startX))
@@ -42,6 +49,8 @@ export function validateLevelDefinition(level: LevelDefinition): readonly LevelV
     obstacleIds.add(obstacle.id);
     if (obstacle.width <= 0 || obstacle.height <= 0 || obstacle.x < 0 || obstacle.x + obstacle.width > level.finishX)
       errors.push({ path: `obstacles.${index}`, message: "Obstacles must have positive dimensions before the finish." });
+    if (obstacle.height > jumpCapabilities.safeObstacleHeight)
+      errors.push({ path: `obstacles.${index}`, message: `Obstacles must not exceed the safe jump height of ${jumpCapabilities.safeObstacleHeight}px.` });
     if (!hasGroundAt(level, obstacle.x) || !hasGroundAt(level, obstacle.x + obstacle.width))
       errors.push({ path: `obstacles.${index}`, message: "Obstacles must sit entirely on solid ground." });
 
