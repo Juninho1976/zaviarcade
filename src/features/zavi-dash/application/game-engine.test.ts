@@ -125,4 +125,25 @@ describe("Zavi Dash game engine", () => {
 
     expect(first).toEqual(second);
   });
+
+  it("keeps a spire near-miss deterministic", () => {
+    const level = createFlatLevel({
+      finishX: 3_000,
+      obstacles: [{ id: "near-miss-spire", kind: "spire", x: 300, width: 90, height: 200 }],
+      physics: { ...zaviDashLevelOne.physics, jumpImpulse: -1_200 },
+      player: { ...zaviDashLevelOne.player, startX: 100 },
+      scoring: { distancePerPoint: 10, completionBonus: 100, maximumScore: 390 },
+      terrain: [{ startX: 0, endX: 3_200 }],
+      world: { width: 3_200, height: 540 },
+    });
+    const inputs = Array.from({ length: 160 }, (_, index): GameInput => (
+      index === 0 ? { jumpPressed: true } : {}
+    ));
+
+    const first = inputs.reduce((state, input) => stepGame(state, level, input), createInitialGameState(level));
+    const second = inputs.reduce((state, input) => stepGame(state, level, input), createInitialGameState(level));
+
+    expect(first.phase).toBe("running");
+    expect(first).toEqual(second);
+  });
 });

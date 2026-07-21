@@ -1,4 +1,5 @@
 import { getMaximumScore } from "@/features/zavi-dash/application/get-maximum-score";
+import { sweptBoundsIntersectTriangle, type Triangle } from "@/features/zavi-dash/application/spire-collision";
 import {
   FIXED_TIME_STEP_SECONDS,
   type Bounds,
@@ -23,6 +24,14 @@ function getObstacleBounds(obstacle: LevelObstacle, level: LevelDefinition): Bou
     y: level.groundY - obstacle.height,
     width: obstacle.width,
     height: obstacle.height,
+  };
+}
+
+function getSpireTriangle(obstacle: LevelObstacle, level: LevelDefinition): Triangle {
+  return {
+    left: { x: obstacle.x, y: level.groundY },
+    apex: { x: obstacle.x + obstacle.width / 2, y: level.groundY - obstacle.height },
+    right: { x: obstacle.x + obstacle.width, y: level.groundY },
   };
 }
 
@@ -122,9 +131,11 @@ function stepRunningGame(state: GameState, level: LevelDefinition, input: GameIn
   };
   const previousBounds = getPlayerBounds(previousPlayer, level);
   const nextBounds = getPlayerBounds(nextPlayer, level);
-  const obstacle = level.obstacles.find((candidate) =>
-    sweptBoundsIntersect(previousBounds, nextBounds, getObstacleBounds(candidate, level)),
-  );
+  const obstacle = level.obstacles.find((candidate) => (
+    candidate.kind === "spire"
+      ? sweptBoundsIntersectTriangle(previousBounds, nextBounds, getSpireTriangle(candidate, level))
+      : sweptBoundsIntersect(previousBounds, nextBounds, getObstacleBounds(candidate, level))
+  ));
 
   if (obstacle) {
     return createDeadState(
