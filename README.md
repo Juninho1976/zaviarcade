@@ -37,6 +37,8 @@ Games are defined in the typed registry at `src/features/games/data/games.ts`. E
 
 Scores can be submitted with `POST /api/games/:slug/scores` using JSON such as `{ "playerName": "Zavi", "score": 987650 }`. The MVP validates and acknowledges submissions; persistent storage will be added later.
 
+The Geometry Dash leaderboard reads live score rows from D1 and ranks them by descending score.
+
 ## Database
 
 Cloudflare D1 is bound to the Worker as `DB`. Version-controlled SQL migrations live in `migrations/`. Run `npm run db:migrate:local` for local development, and `npm run db:migrate:remote` to apply the same migrations to the configured Cloudflare database. The initial schema defines `games`, `players`, and `scores`; scores reference both their game and player, with leaderboard and player lookup indexes.

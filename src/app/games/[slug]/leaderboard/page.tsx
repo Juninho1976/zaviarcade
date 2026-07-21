@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getGameBySlug } from "@/features/games/application/get-game-by-slug";
+import { getLeaderboard } from "@/features/games/application/get-leaderboard";
 import { games } from "@/features/games/data/games";
 
 export function generateStaticParams() {
   return games.map((game) => ({ slug: game.slug }));
 }
+export const dynamic = "force-dynamic";
 
 export default async function LeaderboardPage({
   params,
@@ -18,6 +21,8 @@ export default async function LeaderboardPage({
   if (!game) {
     notFound();
   }
+  const { env } = await getCloudflareContext({ async: true });
+  const entries = await getLeaderboard(env.DB, slug);
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-6 py-12 sm:px-10 lg:py-20">
@@ -30,7 +35,7 @@ export default async function LeaderboardPage({
       <h1 className="mt-3 text-4xl font-black tracking-tight text-slate-950 sm:text-5xl">
         {game.title}
       </h1>
-      {game.leaderboard.entries.length === 0 ? (
+      {entries.length === 0 ? (
         <p className="mt-6 rounded-2xl border border-dashed border-cyan-300 bg-cyan-50/50 p-6 leading-7 text-slate-600">
           Scores will appear here when {game.title} is live.
         </p>
@@ -46,7 +51,7 @@ export default async function LeaderboardPage({
               </tr>
             </thead>
             <tbody>
-              {game.leaderboard.entries.map((entry) => (
+              {entries.map((entry) => (
                 <tr className="border-b border-slate-100 last:border-0" key={entry.rank}>
                   <td className="px-5 py-4 font-bold text-cyan-800">#{entry.rank}</td>
                   <td className="px-5 py-4 font-semibold text-slate-950">{entry.playerName}</td>

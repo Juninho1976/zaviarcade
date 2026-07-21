@@ -13,11 +13,7 @@ export const games: readonly Game[] = [
       src: "/images/games/geometry-dash.png",
     },
     leaderboard: {
-      entries: [
-        { rank: 1, playerName: "Zavi", score: 987_650 },
-        { rank: 2, playerName: "Nova", score: 842_300 },
-        { rank: 3, playerName: "Pixel", score: 715_420 },
-      ],
+      entries: [],
       route: "/games/geometry-dash/leaderboard",
     },
     placement: "coming-soon",
