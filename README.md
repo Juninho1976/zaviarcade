@@ -26,6 +26,8 @@ Open [http://localhost:3000](http://localhost:3000) to view the arcade.
 | `npm run preview` | Run the Cloudflare Worker bundle locally. |
 | `npm run deploy` | Build and deploy the Worker to Cloudflare. |
 | `npm run cf-typegen` | Generate types for Cloudflare bindings. |
+| `npm run db:migrate:local` | Apply D1 migrations to the local database. |
+| `npm run db:migrate:remote` | Apply D1 migrations to `zaviarcade-db`. |
 
 ## Architecture
 
@@ -34,6 +36,10 @@ The application uses the Next.js App Router. Feature code lives in `src/features
 Games are defined in the typed registry at `src/features/games/data/games.ts`. Each entry provides its title, description, thumbnail, route, status, and leaderboard metadata so new games can be added without changing the shared game UI.
 
 Scores can be submitted with `POST /api/games/:slug/scores` using JSON such as `{ "playerName": "Zavi", "score": 987650 }`. The MVP validates and acknowledges submissions; persistent storage will be added later.
+
+## Database
+
+Cloudflare D1 is bound to the Worker as `DB`. Version-controlled SQL migrations live in `migrations/`. Run `npm run db:migrate:local` for local development, and `npm run db:migrate:remote` to apply the same migrations to the configured Cloudflare database. The initial schema defines `games`, `players`, and `scores`; scores reference both their game and player, with leaderboard and player lookup indexes.
 
 ## Current games
 
