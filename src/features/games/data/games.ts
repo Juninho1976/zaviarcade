@@ -5,7 +5,7 @@ export const games: readonly Game[] = [
     slug: "zavi-dash",
     title: "Zavi Dash",
     description: "An original obstacle run made for fast reflexes and fresh starts.",
-    status: "coming-soon",
+    status: "live",
     isPlaceholder: false,
     legacySlugs: ["geometry-dash"],
     route: "/games/zavi-dash",
@@ -17,7 +17,7 @@ export const games: readonly Game[] = [
       entries: [],
       route: "/games/zavi-dash/leaderboard",
     },
-    placement: "coming-soon",
+    placement: "available",
   },
   {
     slug: "mystery-game",

@@ -2,6 +2,7 @@ import { getGamesByPlacement } from "@/features/games/application/get-games-by-p
 import { GameSection } from "@/features/games/components/game-section";
 
 export default function Home() {
+  const availableGames = getGamesByPlacement("available");
   const upcomingGames = getGamesByPlacement("coming-soon");
 
   return (
@@ -17,6 +18,14 @@ export default function Home() {
           Experience designed by Zavi and built by Zavi and family.
         </p>
       </section>
+
+      <GameSection
+        badge="Ready to play"
+        eyebrow="Play now"
+        games={availableGames}
+        headingId="available-games-heading"
+        title="Start your next challenge"
+      />
 
       <GameSection
         badge="Coming soon"
