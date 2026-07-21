@@ -27,6 +27,28 @@ npm run deploy
 
 `npm run dev` uses Next.js for fast local development. `npm run preview` first builds the Cloudflare Worker and then runs it locally with Wrangler, which is the closest local match for production. `npm run deploy` builds the Worker and deploys it to Cloudflare.
 
+## Local verification and smoke testing
+
+Before testing score persistence through the local Worker preview, apply the D1 migrations:
+
+```bash
+npm run db:migrate:local
+```
+
+Run the automated browser journey checks (desktop and mobile) with:
+
+```bash
+npm run test:browser
+```
+
+For a production-like local smoke test, start the Worker preview:
+
+```bash
+npm run preview
+```
+
+Then verify `/`, `/games`, `/games/zavi-dash`, `/games/zavi-dash/leaderboard`, `/leaderboards`, and `/about` at `http://localhost:8787`. Play a completed Zavi Dash run, save the score, and confirm it appears on the local leaderboard. After a production deployment, repeat the same route and completed-score checks on the Cloudflare deployment before announcing the release.
+
 To regenerate Cloudflare binding types after adding a binding, run:
 
 ```bash

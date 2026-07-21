@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createInitialGameState } from "@/features/zavi-dash/application/game-engine";
 import { zaviDashLevelOne } from "@/features/zavi-dash/data/zavi-dash-level-one";
 import type { GameState } from "@/features/zavi-dash/domain/game";
+import type { LevelDefinition } from "@/features/zavi-dash/domain/level";
 import {
   canSubmitCompletedRun,
   submitCompletedZaviDashScore,
@@ -12,15 +13,19 @@ import {
 import { ZaviDashCanvas } from "./zavi-dash-canvas";
 import { ZaviDashRunSummary } from "./zavi-dash-run-summary";
 
-export function ZaviDashGame() {
-  const [gameState, setGameState] = useState<GameState>(() => createInitialGameState(zaviDashLevelOne));
+type ZaviDashGameProps = {
+  level?: LevelDefinition;
+};
+
+export function ZaviDashGame({ level = zaviDashLevelOne }: ZaviDashGameProps) {
+  const [gameState, setGameState] = useState<GameState>(() => createInitialGameState(level));
   const [playerName, setPlayerName] = useState("");
   const [restartRequest, setRestartRequest] = useState(0);
   const [submission, setSubmission] = useState<ScoreSubmissionUiState>({ status: "idle" });
   const progressPercent = Math.round(gameState.progress * 100);
 
   function restartRun(): void {
-    setGameState(createInitialGameState(zaviDashLevelOne));
+    setGameState(createInitialGameState(level));
     setSubmission({ status: "idle" });
     setRestartRequest((request) => request + 1);
   }
@@ -66,6 +71,7 @@ export function ZaviDashGame() {
       </div>
       <div className="mt-6">
         <ZaviDashCanvas
+          level={level}
           onGameStateChange={setGameState}
           restartRequest={restartRequest}
         />

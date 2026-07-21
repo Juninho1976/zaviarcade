@@ -20,6 +20,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the arcade.
 | `npm run dev` | Run the local development server. |
 | `npm run lint` | Run ESLint. |
 | `npm run test` | Run the unit tests. |
+| `npm run test:browser` | Run Playwright browser tests at desktop and mobile viewports. |
 | `npm run build` | Build the production application. |
 | `npm run start` | Serve a production build. |
 | `npm run build:worker` | Build the Cloudflare Worker bundle. |
@@ -37,12 +38,28 @@ Games are defined in the typed registry at `src/features/games/data/games.ts`. E
 
 Zavi Dash Level One is defined as typed, framework-independent course and visual-token data in `src/features/zavi-dash`. Its fixed-timestep game engine is also pure TypeScript, keeping future level content, simulation, and Canvas rendering separate.
 
-The reusable `ZaviDashCanvas` client component renders the game and supports keyboard, mouse, touch, and visible controls. Its diagnostic overlay is enabled in development, or in production only when the component receives an explicit `debug` flag. The live Zavi Dash page adds the run HUD and player-name collection; score submission is handled separately by the score API flow.
+The reusable `ZaviDashCanvas` client component renders the game and supports keyboard, mouse, touch, and visible controls. Its diagnostic overlay is enabled in development, or in production only when the component receives an explicit `debug` flag. The live Zavi Dash page adds the run HUD, player-name collection, and completed-run-only score submission.
 
 Scores can be submitted with `POST /api/games/:slug/scores` using JSON such as `{ "playerName": "Zavi", "score": 1086 }`. The API normalizes player names, validates whole-number scores against the level maximum, persists valid submissions to D1, and returns the saved score ID. The live game only enables submission after a completed run and prevents ordinary duplicate clicks, but client-generated scores are not cheat-proof; server-authoritative verification, authenticated players, and stronger anti-cheat controls are deferred.
 
 The Zavi Dash leaderboard reads live score rows from D1 and ranks them by descending score.
 The global `/leaderboards` page lists the available game leaderboards from the game registry.
+
+## Testing the game locally
+
+Run the fast deterministic and local-D1 checks with:
+
+```bash
+npm run test
+```
+
+Run browser coverage for keyboard, pointer/touch, death, restart, completion, score-submission UI, and leaderboard navigation with:
+
+```bash
+npm run test:browser
+```
+
+The Playwright command starts its own local development server. Its short deterministic game scenarios are enabled only for that test server and are never available in production builds.
 
 ## Database
 
