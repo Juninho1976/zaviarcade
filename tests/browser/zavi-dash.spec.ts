@@ -31,6 +31,14 @@ test.describe("Zavi Dash player journey", () => {
     await expect(page.locator("#zavi-dash-status")).toContainText("ready");
   });
 
+  test("survives a visible near-miss beside a triangular spire", async ({ page }) => {
+    await page.goto("/games/zavi-dash?e2e=spire-near-miss");
+    await page.getByRole("img", { name: /Zavi Dash game canvas/i }).click();
+
+    await page.waitForTimeout(1_200);
+    await expect(page.locator("#zavi-dash-status")).toContainText("running");
+  });
+
   test("completes a run, submits once, and opens the leaderboard", async ({ page }) => {
     await page.route("**/api/games/zavi-dash/scores", async (route) => {
       await route.fulfill({
