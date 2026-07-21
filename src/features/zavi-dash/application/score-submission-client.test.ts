@@ -22,4 +22,12 @@ describe("Zavi Dash score submission client", () => {
     expect(fetchMock).toHaveBeenCalledWith("/api/games/zavi-dash/scores", expect.objectContaining({ method: "POST" }));
     vi.unstubAllGlobals();
   });
+
+  it("surfaces the server validation message when saving fails", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ error: "Player name is required." }), { status: 400 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(submitCompletedZaviDashScore("", 1_086)).rejects.toThrow("Player name is required.");
+    vi.unstubAllGlobals();
+  });
 });

@@ -31,6 +31,20 @@ describe("validateLevelDefinition", () => {
     expect(validateLevelDefinition(level).map((error) => error.message)).toContain("Obstacles must not overlap.");
   });
 
+  it("rejects gaps and obstacle heights that exceed the safe deterministic jump limits", () => {
+    const impossibleGap = {
+      ...zaviDashLevelOne,
+      terrain: [{ startX: 0, endX: 1_000 }, { startX: 1_162, endX: 7_500 }],
+    };
+    const impossibleBlock = {
+      ...zaviDashLevelOne,
+      obstacles: [{ id: "too-tall", kind: "block" as const, x: 500, width: 80, height: 121 }],
+    };
+
+    expect(validateLevelDefinition(impossibleGap).map((error) => error.message)).toContain("Ground gaps must not exceed the safe jump distance of 161px.");
+    expect(validateLevelDefinition(impossibleBlock).map((error) => error.message)).toContain("Obstacles must not exceed the safe jump height of 120px.");
+  });
+
   it("rejects a score ceiling that does not match the level rules", () => {
     const level = {
       ...zaviDashLevelOne,
