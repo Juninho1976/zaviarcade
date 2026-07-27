@@ -113,6 +113,20 @@ describe("Zavi Dash game engine", () => {
     expect(state).toMatchObject({ phase: "dead", deathReason: "gap" });
   });
 
+  it("does not snap a player back onto ground after falling below the far edge of a gap", () => {
+    const level = createFlatLevel({
+      terrain: [
+        { startX: 0, endX: 220 },
+        { startX: 340, endX: 800 },
+      ],
+      finishX: 760,
+      scoring: { distancePerPoint: 10, completionBonus: 100, maximumScore: 166 },
+    });
+    const state = runSteps(createInitialGameState(level), level, 180, { startPressed: true });
+
+    expect(state).toMatchObject({ phase: "dead", deathReason: "gap" });
+  });
+
   it("completes a clear level with bounded progress and maximum score", () => {
     const level = createFlatLevel();
     const state = runSteps(createInitialGameState(level), level, 220, { startPressed: true });
@@ -149,6 +163,32 @@ describe("Zavi Dash game engine", () => {
 
     expect(first).toEqual(second);
   });
+
+  it.each([90, 100, 110, 120, 130])(
+    "clears every Level One obstacle and gap with a %ipx jump lead",
+    (jumpLead) => {
+      const gapStarts = zaviDashLevelOne.terrain.slice(0, -1).map((segment) => segment.endX);
+      const hazards = [
+        ...zaviDashLevelOne.obstacles.map((obstacle) => obstacle.x),
+        ...gapStarts,
+      ].sort((first, second) => first - second);
+      let state = createInitialGameState(zaviDashLevelOne);
+
+      for (let step = 0; step < 4_000 && state.phase !== "completed" && state.phase !== "dead"; step += 1) {
+        const nextHazard = hazards.find((hazardX) => hazardX > state.player.x);
+        const shouldJump = state.player.grounded &&
+          nextHazard !== undefined &&
+          nextHazard - state.player.x <= jumpLead;
+        state = stepGame(state, zaviDashLevelOne, {
+          jumpPressed: shouldJump,
+          startPressed: step === 0,
+        });
+      }
+
+      expect(state.player.x).toBeGreaterThanOrEqual(zaviDashLevelOne.finishX);
+      expect(state).toMatchObject({ phase: "completed" });
+    },
+  );
 
   it("keeps a spire near-miss deterministic", () => {
     const level = createFlatLevel({

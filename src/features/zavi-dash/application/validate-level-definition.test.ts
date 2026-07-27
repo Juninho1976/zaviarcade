@@ -31,18 +31,23 @@ describe("validateLevelDefinition", () => {
     expect(validateLevelDefinition(level).map((error) => error.message)).toContain("Obstacles must not overlap.");
   });
 
-  it("rejects gaps and obstacle heights that exceed the safe deterministic jump limits", () => {
+  it("rejects gaps and obstacle dimensions that exceed the safe deterministic jump limits", () => {
     const impossibleGap = {
       ...zaviDashLevelOne,
-      terrain: [{ startX: 0, endX: 1_000 }, { startX: 1_162, endX: 7_500 }],
+      terrain: [{ startX: 0, endX: 1_000 }, { startX: 1_178, endX: 7_500 }],
     };
     const impossibleBlock = {
       ...zaviDashLevelOne,
-      obstacles: [{ id: "too-tall", kind: "block" as const, x: 500, width: 80, height: 121 }],
+      obstacles: [{ id: "too-tall", kind: "block" as const, x: 500, width: 80, height: 134 }],
+    };
+    const impossibleWideBlock = {
+      ...zaviDashLevelOne,
+      obstacles: [{ id: "too-wide", kind: "block" as const, x: 500, width: 178, height: 80 }],
     };
 
-    expect(validateLevelDefinition(impossibleGap).map((error) => error.message)).toContain("Ground gaps must not exceed the safe jump distance of 161px.");
-    expect(validateLevelDefinition(impossibleBlock).map((error) => error.message)).toContain("Obstacles must not exceed the safe jump height of 120px.");
+    expect(validateLevelDefinition(impossibleGap).map((error) => error.message)).toContain("Ground gaps must not exceed the safe jump distance of 177px.");
+    expect(validateLevelDefinition(impossibleBlock).map((error) => error.message)).toContain("Obstacles must not exceed the safe jump height of 133px.");
+    expect(validateLevelDefinition(impossibleWideBlock).map((error) => error.message)).toContain("Obstacles must not exceed the safe jump width of 177px.");
   });
 
   it("rejects a score ceiling that does not match the level rules", () => {

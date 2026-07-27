@@ -11,15 +11,22 @@ type ScoreSubmissionResponse = {
   scoreId?: unknown;
 };
 
-export function canSubmitCompletedRun(state: GameState, submission: ScoreSubmissionUiState): boolean {
-  return state.phase === "completed" && (submission.status === "idle" || submission.status === "error");
+export function canSubmitFinishedRun(state: GameState, submission: ScoreSubmissionUiState): boolean {
+  return (
+    (state.phase === "dead" || state.phase === "completed") &&
+    (submission.status === "idle" || submission.status === "error")
+  );
 }
 
-export async function submitCompletedZaviDashScore(playerName: string, score: number): Promise<number> {
+export async function submitZaviDashScore(
+  playerName: string,
+  score: number,
+  submissionId: string,
+): Promise<number> {
   const response = await fetch("/api/games/zavi-dash/scores", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ playerName, score }),
+    body: JSON.stringify({ playerName, score, submissionId }),
   });
   const body = await response.json().catch(() => ({})) as ScoreSubmissionResponse;
 

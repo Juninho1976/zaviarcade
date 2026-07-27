@@ -51,6 +51,8 @@ export function validateLevelDefinition(level: LevelDefinition): readonly LevelV
       errors.push({ path: `obstacles.${index}`, message: "Obstacles must have positive dimensions before the finish." });
     if (obstacle.height > jumpCapabilities.safeObstacleHeight)
       errors.push({ path: `obstacles.${index}`, message: `Obstacles must not exceed the safe jump height of ${jumpCapabilities.safeObstacleHeight}px.` });
+    if (obstacle.width > jumpCapabilities.safeObstacleWidth)
+      errors.push({ path: `obstacles.${index}`, message: `Obstacles must not exceed the safe jump width of ${jumpCapabilities.safeObstacleWidth}px.` });
     if (!hasGroundAt(level, obstacle.x) || !hasGroundAt(level, obstacle.x + obstacle.width))
       errors.push({ path: `obstacles.${index}`, message: "Obstacles must sit entirely on solid ground." });
 

@@ -9,11 +9,13 @@ import { zaviDashCanvasViewport } from "./canvas-viewport";
 import { getKeyboardGameInput, getPointerGameInput } from "./game-controls";
 import { isDebugOverlayEnabled, renderDebugOverlay } from "./render-debug-overlay";
 import { renderZaviDashGame } from "./render-zavi-dash-game";
+import { createZaviDashAudio, type ZaviDashAudio } from "./zavi-dash-audio";
 
 type ZaviDashCanvasProps = {
   debug?: boolean;
   level?: LevelDefinition;
   onGameStateChange?: (state: GameState) => void;
+  onRestart?: () => void;
   restartRequest?: number;
 };
 
@@ -29,6 +31,7 @@ export function ZaviDashCanvas({
   debug = false,
   level = zaviDashLevelOne,
   onGameStateChange,
+  onRestart,
   restartRequest = 0,
 }: ZaviDashCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -36,16 +39,52 @@ export function ZaviDashCanvas({
   const pendingInputRef = useRef<GameInput>({});
   const onGameStateChangeRef = useRef(onGameStateChange);
   const restartRequestRef = useRef(restartRequest);
+  const audioRef = useRef<ZaviDashAudio | null>(null);
   const [presentation, setPresentation] = useState<GameState>(() => createInitialGameState(level));
+  const [muted, setMuted] = useState(false);
   const debugEnabled = isDebugOverlayEnabled({ explicitFlag: debug });
 
   function queueInput(input: GameInput): void {
+    audioRef.current?.startMusic();
     pendingInputRef.current = mergeInput(pendingInputRef.current, input);
   }
 
   useEffect(() => {
+    audioRef.current = createZaviDashAudio();
+
+    return () => {
+      audioRef.current?.destroy();
+      audioRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    audioRef.current?.setMuted(muted);
+  }, [muted]);
+
+  useEffect(() => {
     onGameStateChangeRef.current = onGameStateChange;
   }, [onGameStateChange]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target;
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        (target instanceof HTMLElement && target.isContentEditable)
+      ) return;
+
+      const input = getKeyboardGameInput(event.code);
+      if (!input) return;
+
+      event.preventDefault();
+      queueInput(input);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   useEffect(() => {
     if (restartRequest === restartRequestRef.current) return;
@@ -101,7 +140,21 @@ export function ZaviDashCanvas({
       pendingInputRef.current = {};
 
       while (accumulator >= FIXED_TIME_STEP_SECONDS) {
+        const previousPhase = engineStateRef.current.phase;
         engineStateRef.current = stepGame(engineStateRef.current, level, input);
+        if (previousPhase !== engineStateRef.current.phase) {
+          if (engineStateRef.current.phase === "dead") {
+            audioRef.current?.stopMusic();
+            if (engineStateRef.current.deathReason === "gap") {
+              audioRef.current?.playFall();
+            } else {
+              audioRef.current?.playCrash();
+            }
+          } else if (engineStateRef.current.phase === "completed") {
+            audioRef.current?.stopMusic();
+            audioRef.current?.playVictory();
+          }
+        }
         input = {};
         accumulator -= FIXED_TIME_STEP_SECONDS;
       }
@@ -134,17 +187,11 @@ export function ZaviDashCanvas({
         className="block aspect-video w-full touch-manipulation rounded-3xl border border-slate-200 bg-slate-950 shadow-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-700"
         data-debug-enabled={debugEnabled}
         height={zaviDashCanvasViewport.height}
-        onKeyDown={(event) => {
-          const input = getKeyboardGameInput(event.code);
-          if (!input) return;
-
-          event.preventDefault();
-          queueInput(input);
-        }}
         onPointerDown={(event) => {
           event.currentTarget.focus();
           queueInput(getPointerGameInput());
         }}
+        role="img"
         tabIndex={0}
         width={zaviDashCanvasViewport.width}
       />
@@ -159,10 +206,25 @@ export function ZaviDashCanvas({
         <button
           className="rounded-xl border border-slate-300 px-5 py-3 font-bold text-slate-800 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-700"
           disabled={!canRestart}
-          onClick={() => queueInput({ restartPressed: true })}
+          onClick={() => {
+            if (onRestart) {
+              onRestart();
+            } else {
+              queueInput({ restartPressed: true });
+            }
+          }}
           type="button"
         >
           Restart
+        </button>
+        <button
+          aria-label={muted ? "Turn sound on" : "Turn sound off"}
+          aria-pressed={!muted}
+          className="rounded-xl border border-slate-300 px-5 py-3 font-bold text-slate-800 transition-colors hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-700"
+          onClick={() => setMuted((current) => !current)}
+          type="button"
+        >
+          Sound: {muted ? "Off" : "On"}
         </button>
         <p className="text-sm font-semibold text-slate-600">
           {presentation.phase} · {progressPercent}% · {presentation.score.toLocaleString()} points

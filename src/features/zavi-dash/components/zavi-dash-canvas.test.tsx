@@ -9,6 +9,7 @@ describe("ZaviDashCanvas", () => {
     expect(markup).toContain("Zavi Dash game canvas");
     expect(markup).toContain("Jump");
     expect(markup).toContain("Restart");
+    expect(markup).toContain("Sound: ");
     expect(markup).toContain('aria-live="polite"');
     expect(markup).toContain('data-debug-enabled="true"');
   });

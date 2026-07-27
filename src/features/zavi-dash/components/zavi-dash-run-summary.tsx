@@ -38,11 +38,11 @@ export function ZaviDashRunSummary({
       <p className="mt-3 leading-7 text-slate-600">
         {completed
           ? `Your completed score is ${state.score.toLocaleString()} points. We are saving it to the leaderboard with the name above.`
-          : "Restart and complete the level to submit a score."}
+          : `Your run score is ${state.score.toLocaleString()} points. We are saving it to the leaderboard with the name above.`}
       </p>
       {submission.status === "error" ? <p className="mt-4 text-sm font-semibold text-red-700" role="alert">{submission.message}</p> : null}
-      {completed && submission.status === "pending" ? <p className="mt-4 text-sm font-semibold text-slate-700">Saving score…</p> : null}
-      {completed && submission.status === "error" ? (
+      {submission.status === "pending" ? <p className="mt-4 text-sm font-semibold text-slate-700">Saving score…</p> : null}
+      {submission.status === "error" ? (
         <button
           className="mt-4 rounded-xl bg-cyan-800 px-5 py-3 font-bold text-white transition-colors hover:bg-cyan-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-700"
           onClick={onSubmit}
