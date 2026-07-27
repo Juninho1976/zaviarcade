@@ -170,6 +170,7 @@ function stepRunningGame(state: GameState, level: LevelDefinition, input: GameIn
   const playerCenterX = nextPlayer.x + level.player.width / 2;
   if (
     nextPlayer.velocityY >= 0 &&
+    previousPlayer.y + level.player.height <= level.groundY &&
     hasGroundAt(level, playerCenterX) &&
     nextPlayer.y + level.player.height >= level.groundY
   ) {

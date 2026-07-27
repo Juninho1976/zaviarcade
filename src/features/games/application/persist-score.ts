@@ -14,6 +14,16 @@ export async function persistScore(database: Database, slug: string, submission:
   const playerId = player.results[0]?.id;
   if (!playerId) return { success: false as const, message: "Player could not be created." };
 
-  const score = await database.prepare("INSERT INTO scores (game_id, player_id, score) VALUES (?, ?, ?)").bind(gameId, playerId, submission.score).run();
-  return { success: true as const, scoreId: score.meta.last_row_id };
+  await database
+    .prepare("INSERT OR IGNORE INTO scores (game_id, player_id, score, submission_id) VALUES (?, ?, ?, ?)")
+    .bind(gameId, playerId, submission.score, submission.submissionId)
+    .run();
+  const score = await database
+    .prepare("SELECT id FROM scores WHERE submission_id = ?")
+    .bind(submission.submissionId)
+    .all<IdRow>();
+  const scoreId = score.results[0]?.id;
+  if (!scoreId) return { success: false as const, message: "Score could not be created." };
+
+  return { success: true as const, scoreId };
 }

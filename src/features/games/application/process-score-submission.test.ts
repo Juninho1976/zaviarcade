@@ -14,7 +14,11 @@ describe("processScoreSubmission", () => {
   it("rejects an exhausted rate limit before persisting a valid score", async () => {
     const limit = async () => ({ success: false });
 
-    await expect(processScoreSubmission(database, "zavi-dash", { playerName: "Zavi", score: 100 }, {
+    await expect(processScoreSubmission(database, "zavi-dash", {
+      playerName: "Zavi",
+      score: 1_086,
+      submissionId: "123e4567-e89b-42d3-a456-426614174000",
+    }, {
       rateLimiter: { limit },
       rateLimitKey: "score-submission:test",
     })).resolves.toEqual({
@@ -34,7 +38,11 @@ describe("processScoreSubmission", () => {
       }),
     };
 
-    await expect(processScoreSubmission(unknownGameDatabase, "not-a-game", { playerName: "Zavi", score: 100 })).resolves.toEqual({
+    await expect(processScoreSubmission(unknownGameDatabase, "not-a-game", {
+      playerName: "Zavi",
+      score: 100,
+      submissionId: "123e4567-e89b-42d3-a456-426614174000",
+    })).resolves.toEqual({
       success: false,
       status: 404,
       message: "Game not found.",

@@ -16,7 +16,7 @@ describe("ZaviDashRunSummary", () => {
 
     expect(markup).toContain("Run ended");
     expect(markup).toContain("Restart run");
-    expect(markup).not.toContain("Save score");
+    expect(markup).toContain("Your run score is 120 points");
   });
 
   it("shows a distinct completed state with the final score", () => {

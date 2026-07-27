@@ -1,13 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createInitialGameState } from "@/features/zavi-dash/application/game-engine";
 import { zaviDashLevelOne } from "@/features/zavi-dash/data/zavi-dash-level-one";
 import type { GameState } from "@/features/zavi-dash/domain/game";
 import type { LevelDefinition } from "@/features/zavi-dash/domain/level";
 import {
-  canSubmitCompletedRun,
-  submitCompletedZaviDashScore,
+  canSubmitFinishedRun,
+  submitZaviDashScore,
   type ScoreSubmissionUiState,
 } from "@/features/zavi-dash/application/score-submission-client";
 import { ZaviDashCanvas } from "./zavi-dash-canvas";
@@ -18,26 +18,50 @@ type ZaviDashGameProps = {
   level?: LevelDefinition;
 };
 
+const playerNameStorageKey = "zavi-dash-player-name";
+const playerNameChangeEvent = "zavi-dash-player-name-change";
+
+function subscribeToPlayerName(onStoreChange: () => void): () => void {
+  window.addEventListener("storage", onStoreChange);
+  window.addEventListener(playerNameChangeEvent, onStoreChange);
+
+  return () => {
+    window.removeEventListener("storage", onStoreChange);
+    window.removeEventListener(playerNameChangeEvent, onStoreChange);
+  };
+}
+
+function getStoredPlayerName(): string {
+  return window.localStorage.getItem(playerNameStorageKey) ?? "";
+}
+
 export function ZaviDashGame({ level = zaviDashLevelOne }: ZaviDashGameProps) {
   const [gameState, setGameState] = useState<GameState>(() => createInitialGameState(level));
-  const [playerName, setPlayerName] = useState("");
+  const playerName = useSyncExternalStore(subscribeToPlayerName, getStoredPlayerName, () => "");
   const [restartRequest, setRestartRequest] = useState(0);
   const [submission, setSubmission] = useState<ScoreSubmissionUiState>({ status: "idle" });
   const submittedRun = useRef<number | null>(null);
+  const submissionId = useRef(crypto.randomUUID());
   const progressPercent = Math.round(gameState.progress * 100);
+
+  function updatePlayerName(nextPlayerName: string): void {
+    window.localStorage.setItem(playerNameStorageKey, nextPlayerName);
+    window.dispatchEvent(new Event(playerNameChangeEvent));
+  }
 
   function restartRun(): void {
     setGameState(createInitialGameState(level));
     setSubmission({ status: "idle" });
     setRestartRequest((request) => request + 1);
+    submissionId.current = crypto.randomUUID();
   }
 
   const submitScore = useCallback(async (): Promise<void> => {
-    if (!canSubmitCompletedRun(gameState, submission)) return;
+    if (!canSubmitFinishedRun(gameState, submission)) return;
 
     setSubmission({ status: "pending" });
     try {
-      const scoreId = await submitCompletedZaviDashScore(playerName, gameState.score);
+      const scoreId = await submitZaviDashScore(playerName, gameState.score, submissionId.current);
       setSubmission({ status: "success", scoreId });
     } catch (error) {
       console.error("Zavi Dash score submission failed", {
@@ -51,7 +75,10 @@ export function ZaviDashGame({ level = zaviDashLevelOne }: ZaviDashGameProps) {
   }, [gameState, playerName, submission]);
 
   useEffect(() => {
-    if (gameState.phase !== "completed" || submittedRun.current === restartRequest) return;
+    if (
+      (gameState.phase !== "dead" && gameState.phase !== "completed") ||
+      submittedRun.current === restartRequest
+    ) return;
 
     submittedRun.current = restartRequest;
     void submitScore();
@@ -81,11 +108,12 @@ export function ZaviDashGame({ level = zaviDashLevelOne }: ZaviDashGameProps) {
           </progress>
         </div>
       </div>
-      <ZaviDashPlayerName onChange={setPlayerName} value={playerName} />
+      <ZaviDashPlayerName onChange={updatePlayerName} value={playerName} />
       <div className="mt-6">
         <ZaviDashCanvas
           level={level}
           onGameStateChange={setGameState}
+          onRestart={restartRun}
           restartRequest={restartRequest}
         />
       </div>

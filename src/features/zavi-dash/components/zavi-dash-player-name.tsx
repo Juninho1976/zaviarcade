@@ -9,7 +9,7 @@ export function ZaviDashPlayerName({ onChange, value }: ZaviDashPlayerNameProps)
   return (
     <section className="mt-6 rounded-2xl border border-cyan-200 bg-cyan-50 p-5" aria-labelledby="zavi-dash-player-name-heading">
       <h3 id="zavi-dash-player-name-heading" className="text-lg font-bold text-slate-950">Choose your player name</h3>
-      <p className="mt-1 max-w-2xl leading-7 text-slate-700">Enter your name before playing. A completed run is saved to the leaderboard with this name, and it stays ready while you retry.</p>
+      <p className="mt-1 max-w-2xl leading-7 text-slate-700">Enter your name before playing. Every finished attempt is saved to the leaderboard with this name, and it stays ready while you retry.</p>
       <label className="mt-4 flex max-w-xl flex-col gap-2 text-sm font-semibold text-slate-800" htmlFor="zavi-dash-player-name">
         Player name
         <input

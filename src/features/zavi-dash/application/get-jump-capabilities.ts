@@ -9,6 +9,7 @@ export type JumpCapabilities = {
   maximumHeight: number;
   safeGap: number;
   safeObstacleHeight: number;
+  safeObstacleWidth: number;
 };
 
 export function getJumpCapabilities(level: LevelDefinition): JumpCapabilities {
@@ -32,5 +33,6 @@ export function getJumpCapabilities(level: LevelDefinition): JumpCapabilities {
     maximumHeight,
     safeGap: Math.floor(maximumDistance * safeGapRatio),
     safeObstacleHeight: Math.floor(maximumHeight * safeObstacleHeightRatio),
+    safeObstacleWidth: Math.floor(maximumDistance * safeGapRatio),
   };
 }
