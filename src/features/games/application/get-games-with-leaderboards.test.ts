@@ -4,6 +4,7 @@ import { getGamesWithLeaderboards } from "./get-games-with-leaderboards";
 describe("getGamesWithLeaderboards", () => {
   it("returns registered games with public leaderboards, excluding future placeholders", () => {
     expect(getGamesWithLeaderboards().map((game) => game.slug)).toEqual([
+      "rak-space-invaders",
       "zavi-fish",
       "zavi-dash",
     ]);

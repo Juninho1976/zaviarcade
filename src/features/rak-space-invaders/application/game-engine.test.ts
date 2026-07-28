@@ -1,0 +1,3 @@
+import { describe, expect, it } from "vitest";
+import { createRakState, startRak, stepRak } from "./game-engine";
+describe("Rak Space Invaders engine", () => { it("starts with a 24-invader, three-life level", () => { const state = createRakState(); expect(state.invaders).toHaveLength(24); expect(state.lives).toBe(3); expect(startRak(state).phase).toBe("playing"); }); it("limits firing cooldown", () => { const state = startRak(createRakState()); expect(stepRak(state, { fire: true }).lasers).toHaveLength(1); expect(stepRak({ ...state, fireCooldown: .2 }, { fire: true }).lasers).toHaveLength(0); }); });
