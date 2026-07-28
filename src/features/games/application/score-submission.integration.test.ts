@@ -27,8 +27,8 @@ afterAll(async () => proxy.dispose());
 
 describe("local D1 score submission", () => {
   it("persists a submitted score and returns it through the leaderboard", async () => {
-    const game = await proxy.env.DB.prepare("SELECT id, slug, name FROM games").first<{ id: number; name: string; slug: string }>();
-    expect(game).toEqual({ id: 1, name: "Zavi Dash", slug: "zavi-dash" });
+    const game = await proxy.env.DB.prepare("SELECT id, slug, name, status FROM games").first<{ id: number; name: string; slug: string; status: string }>();
+    expect(game).toEqual({ id: 1, name: "Zavi Dash", slug: "zavi-dash", status: "live" });
 
     const result = await processScoreSubmission(proxy.env.DB, "zavi-dash", {
       playerName: "Zavi",
