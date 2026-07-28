@@ -25,7 +25,11 @@ export default async function ChangePasswordPage({
         </p>
         {query.error ? (
           <p className="mt-5 rounded-xl bg-rose-50 p-3 text-sm font-semibold text-rose-800" role="alert">
-            {query.error === "current" ? "The temporary password was not correct." : "Passwords must match and contain at least 12 characters."}
+            {query.error === "current"
+              ? "The temporary password was not correct."
+              : query.error === "service"
+                ? "Your password changed, but the account could not be marked ready. Ask your administrator to reset it once more."
+                : "Passwords must match and contain at least 12 characters."}
           </p>
         ) : null}
         <form action={changeTemporaryPassword} className="mt-7 space-y-5">
