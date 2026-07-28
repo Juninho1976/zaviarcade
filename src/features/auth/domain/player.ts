@@ -6,4 +6,3 @@ export type AuthenticatedPlayer = {
   role: PlayerRole;
   mustChangePassword: boolean;
 };
-

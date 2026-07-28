@@ -28,4 +28,3 @@ export function generateTemporaryPassword(): string {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
   return Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join("");
 }
-

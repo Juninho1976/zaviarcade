@@ -70,4 +70,3 @@ export function LoginForm({ returnTo }: { returnTo: string }) {
     </form>
   );
 }
-
