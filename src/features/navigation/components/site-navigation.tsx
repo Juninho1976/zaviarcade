@@ -29,9 +29,7 @@ export async function SiteNavigation() {
 
         <nav className="hidden items-center gap-1 sm:flex" aria-label="Main navigation">
           <NavigationLinks />
-          {player?.role === "admin" ? (
-            <Link className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-cyan-50" href="/admin/players">Admin</Link>
-          ) : null}
+          {player?.role === "admin" ? <><Link className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-cyan-50" href="/admin/players">Admin</Link><Link className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-cyan-50" href="/admin/community">Moderation</Link></> : null}
           {player ? (
             <>
               <span className="ml-2 text-sm font-bold text-cyan-900" aria-label={`Logged in as ${player.displayName}`}>{player.displayName}</span>
@@ -51,7 +49,7 @@ export async function SiteNavigation() {
             className="absolute right-0 z-10 mt-2 flex w-48 flex-col rounded-xl border border-slate-200 bg-white p-2 shadow-lg"
           >
             <NavigationLinks />
-            {player?.role === "admin" ? <Link className="rounded-lg px-3 py-2 text-sm font-semibold" href="/admin/players">Admin</Link> : null}
+            {player?.role === "admin" ? <><Link className="rounded-lg px-3 py-2 text-sm font-semibold" href="/admin/players">Admin</Link><Link className="rounded-lg px-3 py-2 text-sm font-semibold" href="/admin/community">Moderation</Link></> : null}
             {player ? (
               <form action={logout} className="border-t border-slate-100 pt-2">
                 <p className="px-3 pb-2 text-xs font-bold text-cyan-900">{player.displayName}</p>
