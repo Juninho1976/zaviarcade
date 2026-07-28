@@ -1,8 +1,13 @@
 "use server";
 
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { safeReturnTo } from "@/features/auth/application/validation";
+import {
+  AccountCompletionError,
+  completeTemporaryPasswordChange,
+} from "@/features/auth/server/complete-temporary-password-change";
 import { getAuthForRequest, getSession } from "@/features/auth/server/session";
 
 export async function changeTemporaryPassword(formData: FormData) {
@@ -17,16 +22,18 @@ export async function changeTemporaryPassword(formData: FormData) {
   }
   try {
     const auth = await getAuthForRequest();
-    await auth.api.changePassword({
-      body: { currentPassword, newPassword, revokeOtherSessions: true },
-      headers: await headers(),
+    const { env } = await getCloudflareContext({ async: true });
+    await completeTemporaryPasswordChange({
+      auth,
+      currentPassword,
+      database: env.DB,
+      newPassword,
+      requestHeaders: await headers(),
+      userId: session.user.id,
     });
-    await auth.api.updateUser({
-      body: { mustChangePassword: false },
-      headers: await headers(),
-    });
-  } catch {
-    redirect(`/account/change-password?returnTo=${encodeURIComponent(returnTo)}&error=current`);
+  } catch (error) {
+    const reason = error instanceof AccountCompletionError ? "service" : "current";
+    redirect(`/account/change-password?returnTo=${encodeURIComponent(returnTo)}&error=${reason}`);
   }
   redirect(returnTo);
 }
