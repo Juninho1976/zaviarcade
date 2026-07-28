@@ -15,7 +15,7 @@ describe("Zavi Fish engine", () => {
     expect(state.hook.y).toBe(88);
     expect(createInitialFishGameState()).toMatchObject({ score: 0, fish: [], elapsedSeconds: 0 });
   });
-  it("ends after sixty seconds and prevents more scoring", () => {
+  it("ends after the configured game duration and prevents more scoring", () => {
     let state = startFishGame(createInitialFishGameState());
     for (let index = 0; index < Math.ceil(ZAVI_FISH_DURATION_SECONDS / ZAVI_FISH_STEP_SECONDS); index++) state = stepFishGame(state, false, () => 0.1);
     expect(state.phase).toBe("over");
