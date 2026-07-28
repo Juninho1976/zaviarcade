@@ -1,6 +1,7 @@
 
 import { getMaximumScore } from "@/features/zavi-dash/application/get-maximum-score";
 import { zaviDashLevelOne } from "@/features/zavi-dash/data/zavi-dash-level-one";
+import { zaviFishMaximumScore } from "@/features/zavi-fish/application/game-engine";
 
 export type ScoreSubmission = { score: number; submissionId: string };
 export type ScoreSubmissionResult =
@@ -11,6 +12,7 @@ const submissionIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f
 
 function getMaximumScoreForGame(slug: string): number | undefined {
   if (slug === "zavi-dash") return getMaximumScore(zaviDashLevelOne);
+  if (slug === "zavi-fish") return zaviFishMaximumScore;
 
   return undefined;
 }
