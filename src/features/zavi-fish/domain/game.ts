@@ -1,5 +1,5 @@
 export const ZAVI_FISH_VIEWPORT = { width: 960, height: 540 } as const;
-export const ZAVI_FISH_DURATION_SECONDS = 60;
+export const ZAVI_FISH_DURATION_SECONDS = 45;
 export const ZAVI_FISH_STEP_SECONDS = 1 / 60;
 
 export type FishType = "large" | "medium" | "small" | "rare";
