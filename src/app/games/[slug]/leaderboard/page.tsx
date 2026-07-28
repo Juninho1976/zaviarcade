@@ -44,7 +44,7 @@ export default async function LeaderboardPage({
       </h1>
       {entries.length === 0 ? (
         <p className="mt-6 rounded-2xl border border-dashed border-cyan-300 bg-cyan-50/50 p-6 leading-7 text-slate-600">
-          Scores will appear here when {game.title} is live.
+          No scores yet. Finish a {game.title} run and be the first on the leaderboard!
         </p>
       ) : (
         <div className="mt-8 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
