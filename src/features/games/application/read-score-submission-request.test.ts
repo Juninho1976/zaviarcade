@@ -6,12 +6,12 @@ describe("readScoreSubmissionRequest", () => {
     const request = new Request("https://zaviarcade.com/api/games/zavi-dash/scores", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ playerName: "Zavi", score: 100 }),
+      body: JSON.stringify({ score: 100, submissionId: "123e4567-e89b-42d3-a456-426614174000" }),
     });
 
     await expect(readScoreSubmissionRequest(request)).resolves.toEqual({
       success: true,
-      body: { playerName: "Zavi", score: 100 },
+      body: { score: 100, submissionId: "123e4567-e89b-42d3-a456-426614174000" },
     });
   });
 
@@ -24,7 +24,7 @@ describe("readScoreSubmissionRequest", () => {
     await expect(readScoreSubmissionRequest(new Request("https://zaviarcade.com", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ playerName: "Zavi", note: "x".repeat(1_024) }),
+      body: JSON.stringify({ score: 100, note: "x".repeat(1_024) }),
     }))).resolves.toEqual(expect.objectContaining({ success: false, status: 413 }));
     await expect(readScoreSubmissionRequest(new Request("https://zaviarcade.com", {
       method: "POST",

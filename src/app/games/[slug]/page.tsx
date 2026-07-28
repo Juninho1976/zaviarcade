@@ -6,6 +6,7 @@ import { getGameBySlug } from "@/features/games/application/get-game-by-slug";
 import { games } from "@/features/games/data/games";
 import { getBrowserTestLevel } from "@/features/zavi-dash/data/zavi-dash-browser-test-levels";
 import { ZaviDashGame } from "@/features/zavi-dash/components/zavi-dash-game";
+import { requirePlayer } from "@/features/auth/server/session";
 
 export function generateStaticParams() {
   return games.map((game) => ({ slug: game.slug }));
@@ -33,6 +34,7 @@ export default async function GamePage({
   }
 
   if (game.slug === "zavi-dash") {
+    const player = await requirePlayer(game.route);
     const browserTestLevel = process.env.ZAVI_ARCADE_E2E === "1" ? getBrowserTestLevel(e2e) : undefined;
 
     return (
@@ -42,7 +44,7 @@ export default async function GamePage({
           <h1 className="mt-3 text-5xl font-black tracking-tight text-slate-950 sm:text-6xl">{game.title}</h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">{game.description}</p>
         </section>
-        <ZaviDashGame level={browserTestLevel} />
+        <ZaviDashGame level={browserTestLevel} playerDisplayName={player.displayName} />
       </main>
     );
   }

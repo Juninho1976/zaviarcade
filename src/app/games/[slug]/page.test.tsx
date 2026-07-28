@@ -1,6 +1,15 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import GamePage from "./page";
+
+vi.mock("@/features/auth/server/session", () => ({
+  requirePlayer: vi.fn().mockResolvedValue({
+    id: "user-1",
+    displayName: "Zavi",
+    role: "player",
+    mustChangePassword: false,
+  }),
+}));
 
 describe("GamePage", () => {
   it("renders the playable Zavi Dash run flow", async () => {
@@ -14,5 +23,6 @@ describe("GamePage", () => {
     expect(markup).toContain("Playable level");
     expect(markup).toContain("Sunlit Sprint");
     expect(markup).toContain("Jump");
+    expect(markup).toContain("Playing as Zavi");
   });
 });

@@ -19,14 +19,13 @@ export function canSubmitFinishedRun(state: GameState, submission: ScoreSubmissi
 }
 
 export async function submitZaviDashScore(
-  playerName: string,
   score: number,
   submissionId: string,
 ): Promise<number> {
   const response = await fetch("/api/games/zavi-dash/scores", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ playerName, score, submissionId }),
+    body: JSON.stringify({ score, submissionId }),
   });
   const body = await response.json().catch(() => ({})) as ScoreSubmissionResponse;
 
