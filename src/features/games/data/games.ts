@@ -2,6 +2,21 @@ import type { Game } from "@/features/games/domain/game";
 
 export const games: readonly Game[] = [
   {
+    slug: "zavi-fish",
+    title: "Zavi Fish",
+    description: "Cast, catch, and reel in colourful fish in a fast one-minute fishing arcade game.",
+    status: "live",
+    isPlaceholder: false,
+    legacySlugs: [],
+    route: "/games/zavi-fish",
+    thumbnail: {
+      alt: "A bright Zavi Fish boat, hook, and colourful underwater fish",
+      src: "/images/games/zavi-fish.svg",
+    },
+    leaderboard: { entries: [], route: "/games/zavi-fish/leaderboard" },
+    placement: "available",
+  },
+  {
     slug: "zavi-dash",
     title: "Zavi Dash",
     description: "An original obstacle run made for fast reflexes and fresh starts.",

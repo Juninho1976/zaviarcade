@@ -5,7 +5,7 @@ describe("getGamesByPlacement", () => {
   it("returns Zavi Dash in the available collection", () => {
     const availableGames = getGamesByPlacement("available");
 
-    expect(availableGames).toEqual([
+    expect(availableGames).toEqual(expect.arrayContaining([
       expect.objectContaining({
         isPlaceholder: false,
         placement: "available",
@@ -16,7 +16,7 @@ describe("getGamesByPlacement", () => {
           src: "/images/games/zavi-dash.svg",
         }),
       }),
-    ]);
+    ]));
     expect(getGamesByPlacement("coming-soon").filter((game) => game.isPlaceholder)).toHaveLength(2);
   });
 
