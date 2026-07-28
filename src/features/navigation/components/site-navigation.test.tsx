@@ -1,10 +1,14 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { SiteNavigation } from "./site-navigation";
 
+vi.mock("@/features/auth/server/session", () => ({
+  getAuthenticatedPlayer: vi.fn().mockResolvedValue(null),
+}));
+
 describe("SiteNavigation", () => {
-  it("renders desktop and mobile navigation with every public route", () => {
-    const navigation = renderToStaticMarkup(<SiteNavigation />);
+  it("renders desktop and mobile navigation with every public route", async () => {
+    const navigation = renderToStaticMarkup(await SiteNavigation());
 
     expect(navigation).toContain('aria-label="Main navigation"');
     expect(navigation).toContain('aria-label="Mobile navigation"');
