@@ -13,7 +13,12 @@ export default defineConfig({
   },
   webServer: {
     command: "npm run dev",
-    env: { ZAVI_ARCADE_E2E: "1" },
+    env: {
+      ADMIN_BOOTSTRAP_TOKEN: "zavi-e2e-bootstrap-only",
+      AUTH_SECRET: "zavi-e2e-auth-secret-that-is-at-least-32-characters",
+      BETTER_AUTH_URL: "http://127.0.0.1:3000",
+      ZAVI_ARCADE_E2E: "1",
+    },
     port: 3000,
     reuseExistingServer: !process.env.CI,
   },

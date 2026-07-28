@@ -38,13 +38,15 @@ Games are defined in the typed registry at `src/features/games/data/games.ts`. E
 
 Zavi Dash Level One is defined as typed, framework-independent course and visual-token data in `src/features/zavi-dash`. Its fixed-timestep game engine is also pure TypeScript, keeping future level content, simulation, and Canvas rendering separate.
 
-The reusable `ZaviDashCanvas` client component renders the game and supports keyboard, mouse, touch, and visible controls. Its diagnostic overlay is enabled in development, or in production only when the component receives an explicit `debug` flag. The live Zavi Dash page adds the run HUD, player-name collection, and score submission when an attempt ends through death or completion.
+The reusable `ZaviDashCanvas` client component renders the game and supports keyboard, mouse, touch, and visible controls. Its diagnostic overlay is enabled in development, or in production only when the component receives an explicit `debug` flag. The live Zavi Dash page adds the run HUD and automatically submits a score when an authenticated player's attempt ends through death or completion.
 
 Zavi Dash uses a fixed-timestep jump simulation. Level validation derives fair maximum gap, obstacle-height, and obstacle-width limits from those physics values, so manually authored or future generated layouts cannot contain an impossible jump.
 
-Scores can be submitted with `POST /api/games/:slug/scores` using JSON such as `{ "playerName": "Zavi", "score": 1086, "submissionId": "123e4567-e89b-42d3-a456-426614174000" }`. Zavi Dash accepts run scores up to its deterministic maximum; reaching the finish adds the completion bonus. A client-generated UUID makes retries idempotent, so a repeated request resolves to the original D1 row rather than duplicating the score. Client-generated scores are not fully cheat-proof; server-authoritative replay verification, authenticated players, and stronger anti-cheat controls are deferred.
+Zavi Arcade uses Better Auth with D1-backed username/password accounts and server-side sessions. The permanent account ID is separate from username, display name, credentials and role. Better Auth's provider-account records allow a future federated identity to link to that same ID without changing how games identify owners. Public registration and player email collection are disabled.
 
-The Zavi Dash leaderboard reads live score rows from D1 and ranks them by descending score.
+Games obtain their player from the shared server-side `requirePlayer()` contract. Scores can be submitted with `POST /api/games/:slug/scores` using JSON such as `{ "score": 1086, "submissionId": "123e4567-e89b-42d3-a456-426614174000" }`; the endpoint derives `user_id` only from the authenticated session. Zavi Dash accepts run scores up to its deterministic maximum. A client-generated UUID makes retries idempotent. Client-generated scores are still not fully cheat-proof; server-authoritative replay verification remains deferred.
+
+The Zavi Dash leaderboard joins each stable score owner to the account's current display name and ranks scores by descending score. Display names are deliberately non-unique; changing one updates historical leaderboard presentation without moving score ownership.
 The global `/leaderboards` page lists the available game leaderboards from the game registry.
 
 ## Testing the game locally
@@ -66,7 +68,24 @@ Install Chromium once after adding dependencies; Playwright’s browser binary i
 
 ## Database
 
-Cloudflare D1 is bound to the Worker as `DB`. Version-controlled SQL migrations live in `migrations/`. Run `npm run db:migrate:local` for local development, and `npm run db:migrate:remote` to apply the same migrations to the configured Cloudflare database. The initial schema defines `games`, `players`, and `scores`; scores reference both their game and player, with leaderboard and player lookup indexes.
+Cloudflare D1 is bound to the Worker as `DB`. Version-controlled SQL migrations live in `migrations/`. Run `npm run db:migrate:local` for local development, and `npm run db:migrate:remote` only as part of the reviewed release process.
+
+Migration `0006_add_player_accounts.sql` adds Better Auth users, sessions, provider accounts, verification and database-backed rate limits. It rebuilds scores around `user_id`. A read-only production check on 2026-07-28 found exactly one nonessential legacy row (`scores.id = 1`, display name `RAK`, score `80`); the migration resets only legacy scores/players before creating authenticated ownership.
+
+## Account administration
+
+There is no registration page. An administrator creates and manages players at `/admin/players`, including temporary passwords, username/display-name changes, password reset and account enable/disable. Passwords are shown only in the creation/reset response. Players ask the administrator or parent for recovery; there is no email recovery or security-question flow.
+
+Configure `AUTH_SECRET` and the temporary `ADMIN_BOOTSTRAP_TOKEN` through Wrangler, never source control. Set `BETTER_AUTH_URL=https://www.zaviarcade.com` as a Worker environment variable. After applying migrations, create the first administrator once:
+
+```bash
+curl -X POST https://www.zaviarcade.com/api/admin/bootstrap \
+  -H "Authorization: Bearer $ADMIN_BOOTSTRAP_TOKEN" \
+  -H "Content-Type: application/json" \
+  --data '{"username":"your-admin-nickname","displayName":"Arcade Admin","password":"a-long-unique-password"}'
+```
+
+The endpoint refuses to create another administrator once one active administrator exists. Remove `ADMIN_BOOTSTRAP_TOKEN` from the Worker after bootstrap. Do not put real bootstrap or account credentials in `.env.example`.
 
 ## Current games
 
