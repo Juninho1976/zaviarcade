@@ -1,0 +1,9 @@
+export const RAK_VIEWPORT = { width: 960, height: 600 } as const;
+export const RAK_STEP = 1 / 60;
+export const RAK_CONFIG = { playerSpeed: 360, laserSpeed: 620, bombSpeed: 210, fireCooldown: .3, maxLasers: 3, invaderStartSpeed: 34, invaderDrop: 22, bombInterval: 1.35, dangerY: 505, playerY: 540 } as const;
+export type InvaderKind = "standard" | "armoured" | "heavy";
+export type Invader = { id: number; x: number; y: number; kind: InvaderKind; hits: number };
+export type Projectile = { x: number; y: number };
+export type RakPhase = "ready" | "playing" | "paused" | "hit" | "complete" | "over";
+export type RakState = { phase: RakPhase; elapsed: number; score: number; lives: number; shipX: number; invaders: readonly Invader[]; lasers: readonly Projectile[]; bombs: readonly Projectile[]; direction: -1 | 1; fireCooldown: number; bombCooldown: number; invaderOffsetY: number; invulnerable: number; };
+export const invaderValues: Record<InvaderKind, { hits: number; points: number; color: string }> = { standard: { hits: 1, points: 100, color: "#67e8f9" }, armoured: { hits: 2, points: 250, color: "#c4b5fd" }, heavy: { hits: 3, points: 500, color: "#fbbf24" } };

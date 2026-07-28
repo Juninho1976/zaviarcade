@@ -1,6 +1,7 @@
 import type { Game } from "@/features/games/domain/game";
 
 export const games: readonly Game[] = [
+  { slug: "rak-space-invaders", title: "Rak Space Invaders", description: "Designed by Zavi’s dad, inspired by a game he loved as a child.", status: "live", isPlaceholder: false, legacySlugs: [], route: "/games/rak-space-invaders", thumbnail: { alt: "A bright original spaceship defending against colourful pixel invaders", src: "/images/games/rak-space-invaders.svg" }, leaderboard: { entries: [], route: "/games/rak-space-invaders/leaderboard" }, placement: "available" },
   {
     slug: "zavi-fish",
     title: "Zavi Fish",

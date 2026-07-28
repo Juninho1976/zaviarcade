@@ -13,6 +13,7 @@ const submissionIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f
 function getMaximumScoreForGame(slug: string): number | undefined {
   if (slug === "zavi-dash") return getMaximumScore(zaviDashLevelOne);
   if (slug === "zavi-fish") return zaviFishMaximumScore;
+  if (slug === "rak-space-invaders") return 25_000;
 
   return undefined;
 }
