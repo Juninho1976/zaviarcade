@@ -13,6 +13,7 @@ type ScoreSubmissionOptions = {
 export async function processScoreSubmission(
   database: Parameters<typeof persistScore>[0],
   slug: string,
+  userId: string,
   body: unknown,
   { rateLimiter, rateLimitKey = "anonymous" }: ScoreSubmissionOptions = {},
 ) {
@@ -24,7 +25,7 @@ export async function processScoreSubmission(
       return { success: false as const, status: 429, message: "Too many score submissions. Please wait a minute and try again." };
     }
   }
-  const persisted = await persistScore(database, slug, validated.submission);
+  const persisted = await persistScore(database, slug, userId, validated.submission);
   if (!persisted.success) return { success: false as const, status: persisted.message === "Game not found." ? 404 : 500, message: persisted.message };
   return { success: true as const, status: 201, score: validated.submission, scoreId: persisted.scoreId };
 }

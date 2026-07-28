@@ -17,6 +17,16 @@ Workers Builds should be enabled for pull requests to receive preview deployment
 
 Add application secrets and environment variables in **Workers & Pages > zaviarcade > Settings > Variables and Secrets**. Configure a value in every environment that needs it; do not commit secrets or `.dev.vars` files.
 
+Account deployments require:
+
+- secret `AUTH_SECRET` (at least 32 random characters)
+- temporary secret `ADMIN_BOOTSTRAP_TOKEN` for first-administrator creation only
+- variable `BETTER_AUTH_URL=https://www.zaviarcade.com`
+
+Use `npx wrangler secret put AUTH_SECRET` and `npx wrangler secret put ADMIN_BOOTSTRAP_TOKEN`. Apply migration `0006_add_player_accounts.sql` before deploying code that requires login. That migration resets the one confirmed legacy Zavi Dash leaderboard row and does not delete games or unrelated data.
+
+After deployment, call `POST /api/admin/bootstrap` once as documented in the README, verify the administrator login, and remove `ADMIN_BOOTSTRAP_TOKEN`. All later account work happens through `/admin/players`; the final usable administrator cannot be disabled.
+
 ## Local commands
 
 ```bash
@@ -48,7 +58,7 @@ For a production-like local smoke test, start the Worker preview:
 npm run preview
 ```
 
-Then verify `/`, `/games`, `/games/zavi-dash`, `/games/zavi-dash/leaderboard`, `/leaderboards`, and `/about` at `http://localhost:8787`. Play a completed Zavi Dash run, save the score, and confirm it appears on the local leaderboard. After a production deployment, repeat the same route and completed-score checks on the Cloudflare deployment before announcing the release.
+Then verify `/`, `/games`, `/login`, `/admin/players`, `/games/zavi-dash`, `/games/zavi-dash/leaderboard`, `/leaderboards`, and `/about` at `http://localhost:8787`. Confirm anonymous game access redirects through login, create a player, finish a Zavi Dash run, and confirm the authenticated display name appears on the leaderboard. After a production deployment, repeat the same checks on the Cloudflare deployment before announcing the release.
 
 To regenerate Cloudflare binding types after adding a binding, run:
 

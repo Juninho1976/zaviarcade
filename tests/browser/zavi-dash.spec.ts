@@ -1,6 +1,38 @@
 import { expect, test } from "@playwright/test";
 
+const admin = {
+  username: "zavi-e2e-admin",
+  displayName: "Zavi Test Admin",
+  password: "zavi-e2e-password-123",
+};
+
+async function ensureAdminAndLogin(page: import("@playwright/test").Page) {
+  const bootstrap = await page.request.post("/api/admin/bootstrap", {
+    headers: { authorization: "Bearer zavi-e2e-bootstrap-only" },
+    data: admin,
+  });
+  const login = await page.request.post("/api/auth/sign-in/username", {
+    data: { username: admin.username, password: admin.password },
+  });
+  expect(login.ok(), `bootstrap ${bootstrap.status()}: ${await bootstrap.text()}; login ${login.status()}: ${await login.text()}`).toBe(true);
+}
+
 test.describe("Zavi Dash player journey", () => {
+  test.beforeEach(async ({ page }) => {
+    await ensureAdminAndLogin(page);
+  });
+
+  test("requires central login and returns to the selected game", async ({ page }) => {
+    await page.context().clearCookies();
+    await page.goto("/games/zavi-dash?e2e=running");
+    await expect(page).toHaveURL(/\/login\?returnTo=/);
+    await page.getByLabel("Username").fill(admin.username);
+    await page.getByLabel("Password").fill(admin.password);
+    await page.getByRole("button", { name: "Log in and play" }).click();
+    await expect(page).toHaveURL("/games/zavi-dash");
+    await expect(page.getByText(`Playing as ${admin.displayName}`)).toBeVisible();
+  });
+
   test("starts with keyboard and pointer or touch controls", async ({ page }, testInfo) => {
     await page.goto("/games/zavi-dash?e2e=running");
     await page.getByRole("heading", { name: "Zavi Dash" }).click();
@@ -28,8 +60,6 @@ test.describe("Zavi Dash player journey", () => {
       });
     });
     await page.goto("/games/zavi-dash?e2e=death");
-    const name = page.getByRole("textbox", { name: "Player name" });
-    await name.fill("Zavi");
     await page.getByRole("img", { name: /Zavi Dash game canvas/i }).click();
 
     await expect(page.getByRole("heading", { name: "Ready for another dash?" })).toBeVisible();
@@ -37,18 +67,14 @@ test.describe("Zavi Dash player journey", () => {
     await expect.poll(() => submissions).toBe(1);
     await page.getByRole("button", { name: "Restart run" }).click();
     await expect(page.locator("#zavi-dash-status")).toContainText("ready");
-    await expect(name).toHaveValue("Zavi");
+    await expect(page.getByText(`Playing as ${admin.displayName}`)).toBeVisible();
   });
 
-  test("keeps the player name after a page refresh without turning typing into jumps", async ({ page }) => {
+  test("keeps the account identity after a page refresh", async ({ page }) => {
     await page.goto("/games/zavi-dash?e2e=running");
-    const name = page.getByRole("textbox", { name: "Player name" });
-    await name.fill("Zavi");
-    await page.keyboard.press("Space");
-    await expect(page.locator("#zavi-dash-status")).toContainText("ready");
-
     await page.reload();
-    await expect(name).toHaveValue("Zavi ");
+    await expect(page.getByText(`Playing as ${admin.displayName}`)).toBeVisible();
+    await expect(page.getByRole("textbox", { name: "Player name" })).toHaveCount(0);
   });
 
   test("survives a visible near-miss beside a triangular spire", async ({ page }) => {
@@ -73,7 +99,7 @@ test.describe("Zavi Dash player journey", () => {
     await expect(page.locator("#zavi-dash-status")).toContainText("running");
   });
 
-  test("keeps the name above the game, submits a completed run once, and opens the leaderboard", async ({ page }) => {
+  test("shows account identity, submits a completed run once, and opens the leaderboard", async ({ page }) => {
     let submissions = 0;
     await page.route("**/api/games/zavi-dash/scores", async (route) => {
       submissions += 1;
@@ -84,13 +110,8 @@ test.describe("Zavi Dash player journey", () => {
       });
     });
     await page.goto("/games/zavi-dash?e2e=complete");
-    const name = page.getByRole("textbox", { name: "Player name" });
     const canvas = page.getByRole("img", { name: /Zavi Dash game canvas/i });
-    const [nameBox, canvasBox] = await Promise.all([name.boundingBox(), canvas.boundingBox()]);
-    expect(nameBox).not.toBeNull();
-    expect(canvasBox).not.toBeNull();
-    expect(nameBox!.y).toBeLessThan(canvasBox!.y);
-    await name.fill("Zavi");
+    await expect(page.getByText(`Playing as ${admin.displayName}`)).toBeVisible();
     await canvas.click();
 
     await expect(page.getByRole("heading", { name: "You reached the finish!" })).toBeVisible();
@@ -110,7 +131,6 @@ test.describe("Zavi Dash player journey", () => {
       });
     });
     await page.goto("/games/zavi-dash?e2e=complete");
-    await page.getByRole("textbox", { name: "Player name" }).fill("Zavi");
     await page.getByRole("img", { name: /Zavi Dash game canvas/i }).click();
 
     await expect(page.getByRole("alert").filter({ hasText: "The score service is unavailable" }))

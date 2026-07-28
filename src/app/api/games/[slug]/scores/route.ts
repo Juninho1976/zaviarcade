@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { processScoreSubmission } from "@/features/games/application/process-score-submission";
 import { readScoreSubmissionRequest } from "@/features/games/application/read-score-submission-request";
+import { createAuth } from "@/features/auth/server/auth";
 
 function getRateLimitKey(request: Request): string {
   const clientAddress = request.headers.get("cf-connecting-ip")?.trim();
@@ -15,8 +16,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
   if (!requestBody.success) return NextResponse.json({ error: requestBody.message }, { status: requestBody.status });
   try {
     const { env } = await getCloudflareContext({ async: true });
-    const result = await processScoreSubmission(env.DB, slug, requestBody.body, {
-      rateLimitKey: getRateLimitKey(request),
+    const session = await createAuth(env.DB, env.AUTH_SECRET).api.getSession({ headers: request.headers });
+    if (!session || session.user.banned) {
+      return NextResponse.json({ error: "Log in with an active player account to save a score." }, { status: 401 });
+    }
+    const result = await processScoreSubmission(env.DB, slug, session.user.id, requestBody.body, {
+      rateLimitKey: `${getRateLimitKey(request)}:${session.user.id}`,
       rateLimiter: env.SCORE_SUBMISSION_LIMITER,
     });
     if (!result.success) return NextResponse.json({ error: result.message }, { status: result.status });

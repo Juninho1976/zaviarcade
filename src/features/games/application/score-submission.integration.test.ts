@@ -6,6 +6,7 @@ import { getPlatformProxy } from "wrangler";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { getLeaderboard } from "./get-leaderboard";
 import { processScoreSubmission } from "./process-score-submission";
+import { createAuth } from "@/features/auth/server/auth";
 
 let proxy: Awaited<ReturnType<typeof getPlatformProxy<{ DB: D1Database }>>>;
 
@@ -30,8 +31,11 @@ describe("local D1 score submission", () => {
     const game = await proxy.env.DB.prepare("SELECT id, slug, name, status FROM games").first<{ id: number; name: string; slug: string; status: string }>();
     expect(game).toEqual({ id: 1, name: "Zavi Dash", slug: "zavi-dash", status: "live" });
 
-    const result = await processScoreSubmission(proxy.env.DB, "zavi-dash", {
-      playerName: "Zavi",
+    await proxy.env.DB.prepare(
+      `INSERT INTO "user" (id, name, email, emailVerified, createdAt, updatedAt, username, role, banned, mustChangePassword)
+       VALUES (?, ?, ?, 0, ?, ?, ?, 'user', 0, 0)`,
+    ).bind("user-zavi", "Zavi", "zavi@players.invalid", Date.now(), Date.now(), "zavi").run();
+    const result = await processScoreSubmission(proxy.env.DB, "zavi-dash", "user-zavi", {
       score: 1_086,
       submissionId: "123e4567-e89b-42d3-a456-426614174000",
     });
@@ -43,14 +47,110 @@ describe("local D1 score submission", () => {
     expect(stored?.id).toBe(result.scoreId);
   });
 
-  it("reuses the normalized player and stores a retried completion exactly once", async () => {
+  it("stores a retried completion once and supports duplicate display names", async () => {
     const submissionId = "223e4567-e89b-42d3-a456-426614174000";
-    await expect(processScoreSubmission(proxy.env.DB, "zavi-dash", { playerName: "Zavi Family", score: 1_086, submissionId })).resolves.toMatchObject({ success: true, status: 201 });
-    await expect(processScoreSubmission(proxy.env.DB, "zavi-dash", { playerName: " Zavi Family ", score: 1_086, submissionId })).resolves.toMatchObject({ success: true, status: 201 });
-    const players = await proxy.env.DB.prepare("SELECT id FROM players WHERE display_name = ?").bind("Zavi Family").all<{ id: number }>();
+    const now = Date.now();
+    await proxy.env.DB.prepare(
+      `INSERT INTO "user" (id, name, email, emailVerified, createdAt, updatedAt, username, role, banned, mustChangePassword)
+       VALUES (?, 'Shared Name', ?, 0, ?, ?, ?, 'user', 0, 0), (?, 'Shared Name', ?, 0, ?, ?, ?, 'user', 0, 0)`,
+    ).bind("user-a", "a@players.invalid", now, now, "player-a", "user-b", "b@players.invalid", now, now, "player-b").run();
+    await expect(processScoreSubmission(proxy.env.DB, "zavi-dash", "user-a", { score: 1_086, submissionId })).resolves.toMatchObject({ success: true, status: 201 });
+    await expect(processScoreSubmission(proxy.env.DB, "zavi-dash", "user-a", { score: 1_086, submissionId })).resolves.toMatchObject({ success: true, status: 201 });
+    const players = await proxy.env.DB.prepare(`SELECT id FROM "user" WHERE name = ?`).bind("Shared Name").all<{ id: string }>();
     const scores = await proxy.env.DB.prepare("SELECT id FROM scores WHERE submission_id = ?").bind(submissionId).all<{ id: number }>();
 
-    expect(players.results).toHaveLength(1);
+    expect(players.results).toHaveLength(2);
     expect(scores.results).toHaveLength(1);
+  });
+});
+
+describe("local D1 account authentication", () => {
+  it("hashes passwords, signs in by username and creates a secure server session", async () => {
+    const auth = createAuth(proxy.env.DB, "test-secret-that-is-at-least-32-characters", true);
+    const signup = await auth.handler(new Request("http://localhost/api/auth/sign-up/email", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        email: "auth-test@players.invalid",
+        name: "Auth Tester",
+        password: "temporary-password-123",
+        username: "auth-tester",
+        mustChangePassword: true,
+      }),
+    }));
+    expect(signup.status).toBe(200);
+    const account = await proxy.env.DB.prepare(
+      `SELECT password FROM account WHERE providerId = 'credential' AND userId = (SELECT id FROM "user" WHERE username = ?)`,
+    ).bind("auth-tester").first<{ password: string }>();
+    expect(account?.password).toBeTruthy();
+    expect(account?.password).not.toContain("temporary-password-123");
+
+    const signIn = await auth.handler(new Request("http://localhost/api/auth/sign-in/username", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ username: "auth-tester", password: "temporary-password-123" }),
+    }));
+    expect(signIn.status).toBe(200);
+    const cookie = signIn.headers.get("set-cookie") ?? "";
+    expect(cookie).toContain("HttpOnly");
+    expect(cookie).toContain("SameSite=Lax");
+    expect(cookie).not.toContain("temporary-password-123");
+  });
+
+  it("keeps public registration disabled in the normal auth configuration", async () => {
+    const auth = createAuth(proxy.env.DB, "test-secret-that-is-at-least-32-characters");
+    const response = await auth.handler(new Request("http://localhost/api/auth/sign-up/email", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        email: "blocked@players.invalid",
+        name: "Blocked",
+        password: "temporary-password-123",
+        username: "blocked-player",
+      }),
+    }));
+    expect(response.status).toBe(404);
+  });
+
+  it("rate-limits repeated username login failures in shared D1 state", async () => {
+    const auth = createAuth(proxy.env.DB, "test-secret-that-is-at-least-32-characters");
+    const statuses: number[] = [];
+    for (let attempt = 0; attempt < 6; attempt += 1) {
+      const response = await auth.handler(new Request("http://localhost/api/auth/sign-in/username", {
+        method: "POST",
+        headers: {
+          "x-forwarded-for": "203.0.113.77",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ username: "does-not-exist", password: "wrong-password-123" }),
+      }));
+      statuses.push(response.status);
+    }
+    expect(statuses.slice(0, 5)).not.toContain(429);
+    expect(statuses[5]).toBe(429);
+  });
+
+  it("prevents a disabled account from signing in", async () => {
+    const auth = createAuth(proxy.env.DB, "test-secret-that-is-at-least-32-characters", true);
+    await auth.handler(new Request("http://localhost/api/auth/sign-up/email", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        email: "disabled@players.invalid",
+        name: "Disabled Player",
+        password: "temporary-password-123",
+        username: "disabled-player",
+      }),
+    }));
+    await proxy.env.DB.prepare(`UPDATE "user" SET banned = 1 WHERE username = ?`).bind("disabled-player").run();
+    const response = await auth.handler(new Request("http://localhost/api/auth/sign-in/username", {
+      method: "POST",
+      headers: {
+        "x-forwarded-for": "203.0.113.88",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ username: "disabled-player", password: "temporary-password-123" }),
+    }));
+    expect(response.status).toBe(403);
   });
 });

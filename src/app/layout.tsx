@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Zavi Arcade",
   description: "Games, challenges, and experiments built by Zavi and family.",
 };
+export const dynamic = "force-dynamic";
 
 export default function RootLayout({
   children,
