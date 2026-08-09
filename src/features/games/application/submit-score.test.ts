@@ -26,4 +26,15 @@ describe("submitScore", () => {
       message: "Score cannot exceed the level maximum of 1086.",
     });
   });
+
+  it("uses Zavi Dash 2's separate deterministic score ceiling", () => {
+    expect(submitScore("zavi-dash-2", { score: 1_536, submissionId })).toEqual({
+      success: true,
+      submission: { score: 1_536, submissionId },
+    });
+    expect(submitScore("zavi-dash-2", { score: 1_537, submissionId })).toEqual({
+      success: false,
+      message: "Score cannot exceed the level maximum of 1536.",
+    });
+  });
 });

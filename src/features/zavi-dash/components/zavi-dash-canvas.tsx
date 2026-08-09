@@ -13,6 +13,7 @@ import { createZaviDashAudio, type ZaviDashAudio } from "./zavi-dash-audio";
 
 type ZaviDashCanvasProps = {
   debug?: boolean;
+  gameTitle?: string;
   level?: LevelDefinition;
   onGameStateChange?: (state: GameState) => void;
   onRestart?: () => void;
@@ -29,6 +30,7 @@ function mergeInput(current: GameInput, next: GameInput): GameInput {
 
 export function ZaviDashCanvas({
   debug = false,
+  gameTitle = "Zavi Dash",
   level = zaviDashLevelOne,
   onGameStateChange,
   onRestart,
@@ -183,7 +185,7 @@ export function ZaviDashCanvas({
       <canvas
         ref={canvasRef}
         aria-describedby="zavi-dash-status"
-        aria-label="Zavi Dash game canvas. Press Space or Arrow Up, click, tap, or use the Jump button to start and jump."
+        aria-label={`${gameTitle} game canvas. Press Space or Arrow Up, click, tap, or use the Jump button to start and jump.`}
         className="block aspect-video w-full touch-manipulation rounded-3xl border border-slate-200 bg-slate-950 shadow-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-700"
         data-debug-enabled={debugEnabled}
         height={zaviDashCanvasViewport.height}
@@ -231,7 +233,7 @@ export function ZaviDashCanvas({
         </p>
       </div>
       <p id="zavi-dash-status" className="sr-only" aria-live="polite">
-        Zavi Dash is {presentation.phase}. Progress {progressPercent} percent. Score {presentation.score}.
+        {gameTitle} is {presentation.phase}. Progress {progressPercent} percent. Score {presentation.score}.
       </p>
     </section>
   );

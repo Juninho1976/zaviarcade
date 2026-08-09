@@ -20,7 +20,7 @@ describe("Zavi Dash score submission client", () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ scoreId: 7 }), { status: 201 }));
     vi.stubGlobal("fetch", fetchMock);
 
-    await expect(submitZaviDashScore(1_086, submissionId)).resolves.toBe(7);
+    await expect(submitZaviDashScore("zavi-dash", 1_086, submissionId)).resolves.toBe(7);
     expect(fetchMock).toHaveBeenCalledWith("/api/games/zavi-dash/scores", expect.objectContaining({
       body: JSON.stringify({ score: 1_086, submissionId }),
       method: "POST",
@@ -32,7 +32,8 @@ describe("Zavi Dash score submission client", () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ error: "Score is invalid." }), { status: 400 }));
     vi.stubGlobal("fetch", fetchMock);
 
-    await expect(submitZaviDashScore(1_086, submissionId)).rejects.toThrow("Score is invalid.");
+    await expect(submitZaviDashScore("zavi-dash-2", 1_536, submissionId)).rejects.toThrow("Score is invalid.");
+    expect(fetchMock).toHaveBeenCalledWith("/api/games/zavi-dash-2/scores", expect.any(Object));
     vi.unstubAllGlobals();
   });
 });
