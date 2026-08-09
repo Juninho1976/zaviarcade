@@ -14,11 +14,18 @@ import { ZaviDashCanvas } from "./zavi-dash-canvas";
 import { ZaviDashRunSummary } from "./zavi-dash-run-summary";
 
 type ZaviDashGameProps = {
+  gameSlug?: "zavi-dash" | "zavi-dash-2";
+  gameTitle?: string;
   level?: LevelDefinition;
   playerDisplayName: string;
 };
 
-export function ZaviDashGame({ level = zaviDashLevelOne, playerDisplayName }: ZaviDashGameProps) {
+export function ZaviDashGame({
+  gameSlug = "zavi-dash",
+  gameTitle = "Zavi Dash",
+  level = zaviDashLevelOne,
+  playerDisplayName,
+}: ZaviDashGameProps) {
   const [gameState, setGameState] = useState<GameState>(() => createInitialGameState(level));
   const [restartRequest, setRestartRequest] = useState(0);
   const [submission, setSubmission] = useState<ScoreSubmissionUiState>({ status: "idle" });
@@ -38,7 +45,7 @@ export function ZaviDashGame({ level = zaviDashLevelOne, playerDisplayName }: Za
 
     setSubmission({ status: "pending" });
     try {
-      const scoreId = await submitZaviDashScore(gameState.score, submissionId.current);
+      const scoreId = await submitZaviDashScore(gameSlug, gameState.score, submissionId.current);
       setSubmission({ status: "success", scoreId });
     } catch (error) {
       console.error("Zavi Dash score submission failed", {
@@ -49,7 +56,7 @@ export function ZaviDashGame({ level = zaviDashLevelOne, playerDisplayName }: Za
         message: error instanceof Error ? error.message : "Your score could not be saved. Please try again.",
       });
     }
-  }, [gameState, submission]);
+  }, [gameSlug, gameState, submission]);
 
   useEffect(() => {
     if (
@@ -66,7 +73,7 @@ export function ZaviDashGame({ level = zaviDashLevelOne, playerDisplayName }: Za
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-sm font-semibold tracking-[0.2em] text-cyan-700 uppercase">Playable level</p>
-          <h2 id="zavi-dash-play-heading" className="mt-2 text-3xl font-bold text-slate-950">Sunlit Sprint</h2>
+          <h2 id="zavi-dash-play-heading" className="mt-2 text-3xl font-bold text-slate-950">{level.name}</h2>
         </div>
         <p className="rounded-full bg-cyan-100 px-4 py-2 text-sm font-semibold text-cyan-900">{gameState.phase}</p>
       </div>
@@ -90,6 +97,7 @@ export function ZaviDashGame({ level = zaviDashLevelOne, playerDisplayName }: Za
       </p>
       <div className="mt-6">
         <ZaviDashCanvas
+          gameTitle={gameTitle}
           level={level}
           onGameStateChange={setGameState}
           onRestart={restartRun}

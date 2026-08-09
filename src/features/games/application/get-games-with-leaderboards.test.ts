@@ -7,6 +7,7 @@ describe("getGamesWithLeaderboards", () => {
       "rak-space-invaders",
       "zavi-fish",
       "zavi-dash",
+      "zavi-dash-2",
     ]);
   });
 });

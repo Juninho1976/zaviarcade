@@ -36,6 +36,24 @@ export const games: readonly Game[] = [
     placement: "available",
   },
   {
+    slug: "zavi-dash-2",
+    title: "Zavi Dash 2",
+    description: "A faster, longer obstacle run for players ready for the next challenge.",
+    status: "live",
+    isPlaceholder: false,
+    legacySlugs: [],
+    route: "/games/zavi-dash-2",
+    thumbnail: {
+      alt: "The advanced neon Zavi Dash 2 obstacle course",
+      src: "/images/games/zavi-dash.svg",
+    },
+    leaderboard: {
+      entries: [],
+      route: "/games/zavi-dash-2/leaderboard",
+    },
+    placement: "available",
+  },
+  {
     slug: "mystery-game",
     title: "Mystery Game",
     description: "A brand-new adventure is loading into the arcade soon.",

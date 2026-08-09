@@ -25,4 +25,17 @@ describe("GamePage", () => {
     expect(markup).toContain("Jump");
     expect(markup).toContain("Playing as Zavi");
   });
+
+  it("renders Zavi Dash 2 with its harder level", async () => {
+    const page = await GamePage({
+      params: Promise.resolve({ slug: "zavi-dash-2" }),
+      searchParams: Promise.resolve({}),
+    });
+    const markup = renderToStaticMarkup(page);
+
+    expect(markup).toContain("Zavi Dash 2");
+    expect(markup).toContain("Neon Gauntlet");
+    expect(markup).toContain("Jump");
+    expect(markup).toContain("Playing as Zavi");
+  });
 });

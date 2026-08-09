@@ -16,6 +16,13 @@ describe("getGamesByPlacement", () => {
           src: "/images/games/zavi-dash.svg",
         }),
       }),
+      expect.objectContaining({
+        isPlaceholder: false,
+        placement: "available",
+        slug: "zavi-dash-2",
+        status: "live",
+        title: "Zavi Dash 2",
+      }),
     ]));
     expect(getGamesByPlacement("coming-soon").filter((game) => game.isPlaceholder)).toHaveLength(2);
   });

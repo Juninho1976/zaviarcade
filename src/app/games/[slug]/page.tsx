@@ -5,6 +5,8 @@ import { getGameByLegacySlug } from "@/features/games/application/get-game-by-le
 import { getGameBySlug } from "@/features/games/application/get-game-by-slug";
 import { games } from "@/features/games/data/games";
 import { getBrowserTestLevel } from "@/features/zavi-dash/data/zavi-dash-browser-test-levels";
+import { zaviDashLevelOne } from "@/features/zavi-dash/data/zavi-dash-level-one";
+import { zaviDashLevelTwo } from "@/features/zavi-dash/data/zavi-dash-level-two";
 import { ZaviDashGame } from "@/features/zavi-dash/components/zavi-dash-game";
 import { ZaviFishGame } from "@/features/zavi-fish/components/zavi-fish-game";
 import { RakSpaceInvadersGame } from "@/features/rak-space-invaders/components/rak-space-invaders-game";
@@ -35,9 +37,10 @@ export default async function GamePage({
     notFound();
   }
 
-  if (game.slug === "zavi-dash") {
+  if (game.slug === "zavi-dash" || game.slug === "zavi-dash-2") {
     const player = await requirePlayer(game.route);
     const browserTestLevel = process.env.ZAVI_ARCADE_E2E === "1" ? getBrowserTestLevel(e2e) : undefined;
+    const level = browserTestLevel ?? (game.slug === "zavi-dash-2" ? zaviDashLevelTwo : zaviDashLevelOne);
 
     return (
       <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-6 py-12 sm:px-10 lg:py-20">
@@ -46,7 +49,12 @@ export default async function GamePage({
           <h1 className="mt-3 text-5xl font-black tracking-tight text-slate-950 sm:text-6xl">{game.title}</h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">{game.description}</p>
         </section>
-        <ZaviDashGame level={browserTestLevel} playerDisplayName={player.displayName} />
+        <ZaviDashGame
+          gameSlug={game.slug}
+          gameTitle={game.title}
+          level={level}
+          playerDisplayName={player.displayName}
+        />
       </main>
     );
   }
