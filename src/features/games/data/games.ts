@@ -72,6 +72,24 @@ export const games: readonly Game[] = [
     placement: "available",
   },
   {
+    slug: "rak-asteroids",
+    title: "Rak Asteroids",
+    description: "A fast 90-second space mission where Rak blasts splitting asteroids and clears the sector.",
+    status: "live",
+    isPlaceholder: false,
+    legacySlugs: [],
+    route: "/games/rak-asteroids",
+    thumbnail: {
+      alt: "Rak’s glowing spacecraft firing through colourful splitting asteroids",
+      src: "/images/games/rak-asteroids.svg",
+    },
+    leaderboard: {
+      entries: [],
+      route: "/games/rak-asteroids/leaderboard",
+    },
+    placement: "available",
+  },
+  {
     slug: "mystery-game",
     title: "Mystery Game",
     description: "A brand-new adventure is loading into the arcade soon.",

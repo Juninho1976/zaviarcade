@@ -48,4 +48,15 @@ describe("submitScore", () => {
       message: "Score cannot exceed the level maximum of 100000.",
     });
   });
+
+  it("accepts Rak Asteroids scores within its 90-second game ceiling", () => {
+    expect(submitScore("rak-asteroids", { score: 19_050, submissionId })).toEqual({
+      success: true,
+      submission: { score: 19_050, submissionId },
+    });
+    expect(submitScore("rak-asteroids", { score: 20_001, submissionId })).toEqual({
+      success: false,
+      message: "Score cannot exceed the level maximum of 20000.",
+    });
+  });
 });

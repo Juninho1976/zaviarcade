@@ -9,6 +9,7 @@ describe("getGamesWithLeaderboards", () => {
       "zavi-dash",
       "zavi-dash-2",
       "georges-pac-man",
+      "rak-asteroids",
     ]);
   });
 });

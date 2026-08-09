@@ -30,6 +30,13 @@ describe("getGamesByPlacement", () => {
         status: "live",
         title: "George (Pac) Man",
       }),
+      expect.objectContaining({
+        isPlaceholder: false,
+        placement: "available",
+        slug: "rak-asteroids",
+        status: "live",
+        title: "Rak Asteroids",
+      }),
     ]));
     expect(getGamesByPlacement("coming-soon").filter((game) => game.isPlaceholder)).toHaveLength(2);
   });
