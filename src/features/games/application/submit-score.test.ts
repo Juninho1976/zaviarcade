@@ -37,4 +37,15 @@ describe("submitScore", () => {
       message: "Score cannot exceed the level maximum of 1536.",
     });
   });
+
+  it("accepts Georges Pac Man scores within its two-minute game ceiling", () => {
+    expect(submitScore("georges-pac-man", { score: 12_340, submissionId })).toEqual({
+      success: true,
+      submission: { score: 12_340, submissionId },
+    });
+    expect(submitScore("georges-pac-man", { score: 100_001, submissionId })).toEqual({
+      success: false,
+      message: "Score cannot exceed the level maximum of 100000.",
+    });
+  });
 });

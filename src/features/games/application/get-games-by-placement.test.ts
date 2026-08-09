@@ -23,6 +23,13 @@ describe("getGamesByPlacement", () => {
         status: "live",
         title: "Zavi Dash 2",
       }),
+      expect.objectContaining({
+        isPlaceholder: false,
+        placement: "available",
+        slug: "georges-pac-man",
+        status: "live",
+        title: "Georges Pac Man",
+      }),
     ]));
     expect(getGamesByPlacement("coming-soon").filter((game) => game.isPlaceholder)).toHaveLength(2);
   });

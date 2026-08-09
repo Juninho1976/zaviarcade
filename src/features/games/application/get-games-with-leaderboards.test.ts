@@ -8,6 +8,7 @@ describe("getGamesWithLeaderboards", () => {
       "zavi-fish",
       "zavi-dash",
       "zavi-dash-2",
+      "georges-pac-man",
     ]);
   });
 });
