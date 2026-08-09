@@ -78,6 +78,28 @@ describe("local D1 score submission", () => {
     expect(zaviDashLeaderboard).not.toContainEqual(expect.objectContaining({ playerName: "George" }));
   });
 
+  it("seeds Rak Asteroids with its own score stream and leaderboard", async () => {
+    const game = await proxy.env.DB.prepare(
+      "SELECT slug, name, status FROM games WHERE slug = ?",
+    ).bind("rak-asteroids").first<{ name: string; slug: string; status: string }>();
+    expect(game).toEqual({ name: "Rak Asteroids", slug: "rak-asteroids", status: "live" });
+
+    const now = Date.now();
+    await proxy.env.DB.prepare(
+      `INSERT INTO "user" (id, name, email, emailVerified, createdAt, updatedAt, username, role, banned, mustChangePassword)
+       VALUES (?, ?, ?, 0, ?, ?, ?, 'user', 0, 0)`,
+    ).bind("user-rak", "Rak", "rak@players.invalid", now, now, "rak").run();
+    await expect(processScoreSubmission(proxy.env.DB, "rak-asteroids", "user-rak", {
+      score: 6_750,
+      submissionId: "423e4567-e89b-42d3-a456-426614174000",
+    })).resolves.toMatchObject({ success: true, status: 201 });
+
+    const leaderboard = await getLeaderboard(proxy.env.DB, "rak-asteroids");
+    expect(leaderboard).toContainEqual(expect.objectContaining({ playerName: "Rak", rank: 1, score: 6_750 }));
+    const spaceInvadersLeaderboard = await getLeaderboard(proxy.env.DB, "rak-space-invaders");
+    expect(spaceInvadersLeaderboard).not.toContainEqual(expect.objectContaining({ playerName: "Rak" }));
+  });
+
   it("stores a retried completion once and supports duplicate display names", async () => {
     const submissionId = "223e4567-e89b-42d3-a456-426614174000";
     const now = Date.now();

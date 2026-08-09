@@ -4,6 +4,7 @@ import { zaviDashLevelOne } from "@/features/zavi-dash/data/zavi-dash-level-one"
 import { zaviDashLevelTwo } from "@/features/zavi-dash/data/zavi-dash-level-two";
 import { zaviFishMaximumScore } from "@/features/zavi-fish/application/game-engine";
 import { GEORGES_PAC_MAN_MAX_SCORE } from "@/features/georges-pac-man/domain/game";
+import { RAK_ASTEROIDS_MAX_SCORE } from "@/features/rak-asteroids/domain/game";
 
 export type ScoreSubmission = { score: number; submissionId: string };
 export type ScoreSubmissionResult =
@@ -18,6 +19,7 @@ function getMaximumScoreForGame(slug: string): number | undefined {
   if (slug === "zavi-fish") return zaviFishMaximumScore;
   if (slug === "rak-space-invaders") return 25_000;
   if (slug === "georges-pac-man") return GEORGES_PAC_MAN_MAX_SCORE;
+  if (slug === "rak-asteroids") return RAK_ASTEROIDS_MAX_SCORE;
 
   return undefined;
 }

@@ -52,4 +52,18 @@ describe("GamePage", () => {
     expect(markup).toContain("Move right");
     expect(markup).toContain("Playing as Zavi");
   });
+
+  it("renders Rak Asteroids with touch-friendly flight controls", async () => {
+    const page = await GamePage({
+      params: Promise.resolve({ slug: "rak-asteroids" }),
+      searchParams: Promise.resolve({}),
+    });
+    const markup = renderToStaticMarkup(page);
+
+    expect(markup).toContain("Rak Asteroids");
+    expect(markup).toContain("Clear Rak’s asteroid field!");
+    expect(markup).toContain("Rotate left");
+    expect(markup).toContain("Fire laser");
+    expect(markup).toContain("Playing as Zavi");
+  });
 });

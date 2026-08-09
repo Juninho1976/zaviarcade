@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Rak Asteroids</title>
+  <desc id="desc">Rak’s glowing white spacecraft fires a pink laser through colourful splitting asteroids.</desc>
+  <defs>
+    <radialGradient id="space"><stop stop-color="#312e81"/><stop offset="1" stop-color="#050816"/></radialGradient>
+    <radialGradient id="rock"><stop stop-color="#c4b5fd"/><stop offset=".48" stop-color="#6366f1"/><stop offset="1" stop-color="#312e81"/></radialGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="8" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="1200" height="675" rx="42" fill="url(#space)"/>
+  <g fill="white" opacity=".72"><circle cx="80" cy="90" r="3"/><circle cx="190" cy="180" r="2"/><circle cx="310" cy="75" r="4"/><circle cx="490" cy="155" r="2"/><circle cx="670" cy="80" r="3"/><circle cx="850" cy="160" r="2"/><circle cx="1060" cy="85" r="4"/><circle cx="1120" cy="300" r="2"/><circle cx="950" cy="540" r="3"/><circle cx="720" cy="570" r="2"/><circle cx="370" cy="560" r="3"/><circle cx="120" cy="490" r="2"/></g>
+  <g transform="translate(310 345) rotate(-8)" filter="url(#glow)"><path d="M95 0-70-62-34 0-70 62z" fill="#f8fafc" stroke="#22d3ee" stroke-width="12"/><circle cx="18" r="15" fill="#facc15"/><path d="m-68-25-82 25 82 25" fill="#fb923c"/></g>
+  <path d="M430 325 760 250" stroke="#f472b6" stroke-width="12" stroke-linecap="round" filter="url(#glow)"/>
+  <g fill="url(#rock)" stroke="#67e8f9" stroke-width="9"><path d="m930 110 95 30 50 76-18 100-88 58-96-29-48-78 18-100z"/><path d="m790 385 48 12 31 44-10 56-46 35-55-18-25-45 12-53z"/><path d="m1040 460 31 8 18 27-7 34-28 20-33-11-15-28 8-32z"/></g>
+  <g stroke="#fbbf24" stroke-width="7" fill="none"><path d="m955 155 45 38-30 54 44 42"/><path d="m780 415 39 28-25 46"/></g>
+  <text x="600" y="625" text-anchor="middle" font-family="system-ui, sans-serif" font-size="68" font-weight="900" fill="white">Rak Asteroids</text>
+</svg>
