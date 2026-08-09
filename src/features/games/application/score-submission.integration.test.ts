@@ -52,6 +52,32 @@ describe("local D1 score submission", () => {
     expect(stored?.id).toBe(result.scoreId);
   });
 
+  it("seeds Georges Pac Man with its own score stream and leaderboard", async () => {
+    const game = await proxy.env.DB.prepare(
+      "SELECT slug, name, status FROM games WHERE slug = ?",
+    ).bind("georges-pac-man").first<{ name: string; slug: string; status: string }>();
+    expect(game).toEqual({ name: "Georges Pac Man", slug: "georges-pac-man", status: "live" });
+
+    const now = Date.now();
+    await proxy.env.DB.prepare(
+      `INSERT INTO "user" (id, name, email, emailVerified, createdAt, updatedAt, username, role, banned, mustChangePassword)
+       VALUES (?, ?, ?, 0, ?, ?, ?, 'user', 0, 0)`,
+    ).bind("user-georges", "Georges", "georges@players.invalid", now, now, "georges",).run();
+    await expect(processScoreSubmission(proxy.env.DB, "georges-pac-man", "user-georges", {
+      score: 4_250,
+      submissionId: "323e4567-e89b-42d3-a456-426614174000",
+    })).resolves.toMatchObject({ success: true, status: 201 });
+
+    const leaderboard = await getLeaderboard(proxy.env.DB, "georges-pac-man");
+    expect(leaderboard).toContainEqual(expect.objectContaining({
+      playerName: "Georges",
+      rank: 1,
+      score: 4_250,
+    }));
+    const zaviDashLeaderboard = await getLeaderboard(proxy.env.DB, "zavi-dash");
+    expect(zaviDashLeaderboard).not.toContainEqual(expect.objectContaining({ playerName: "Georges" }));
+  });
+
   it("stores a retried completion once and supports duplicate display names", async () => {
     const submissionId = "223e4567-e89b-42d3-a456-426614174000";
     const now = Date.now();

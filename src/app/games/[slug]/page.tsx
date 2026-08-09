@@ -10,6 +10,7 @@ import { zaviDashLevelTwo } from "@/features/zavi-dash/data/zavi-dash-level-two"
 import { ZaviDashGame } from "@/features/zavi-dash/components/zavi-dash-game";
 import { ZaviFishGame } from "@/features/zavi-fish/components/zavi-fish-game";
 import { RakSpaceInvadersGame } from "@/features/rak-space-invaders/components/rak-space-invaders-game";
+import { GeorgesPacManGame } from "@/features/georges-pac-man/components/georges-pac-man-game";
 import { requirePlayer } from "@/features/auth/server/session";
 
 export function generateStaticParams() {
@@ -70,6 +71,20 @@ export default async function GamePage({
           <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">{game.description}</p>
         </section>
         <ZaviFishGame playerDisplayName={player.displayName} />
+      </main>
+    );
+  }
+  if (game.slug === "georges-pac-man") {
+    const player = await requirePlayer(game.route);
+
+    return (
+      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-6 py-12 sm:px-10 lg:py-20">
+        <section className="max-w-3xl">
+          <p className="text-sm font-semibold tracking-[0.2em] text-cyan-700 uppercase">Live game</p>
+          <h1 className="mt-3 text-5xl font-black tracking-tight text-slate-950 sm:text-6xl">{game.title}</h1>
+          <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">{game.description}</p>
+        </section>
+        <GeorgesPacManGame playerDisplayName={player.displayName} />
       </main>
     );
   }

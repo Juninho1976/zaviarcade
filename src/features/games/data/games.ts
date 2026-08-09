@@ -54,6 +54,24 @@ export const games: readonly Game[] = [
     placement: "available",
   },
   {
+    slug: "georges-pac-man",
+    title: "Georges Pac Man",
+    description: "A cheerful two-minute maze chase inspired by Zavi’s friend Georges.",
+    status: "live",
+    isPlaceholder: false,
+    legacySlugs: [],
+    route: "/games/georges-pac-man",
+    thumbnail: {
+      alt: "A glowing yellow maze hero chasing colourful ghosts through a blue arcade maze",
+      src: "/images/games/georges-pac-man.svg",
+    },
+    leaderboard: {
+      entries: [],
+      route: "/games/georges-pac-man/leaderboard",
+    },
+    placement: "available",
+  },
+  {
     slug: "mystery-game",
     title: "Mystery Game",
     description: "A brand-new adventure is loading into the arcade soon.",
