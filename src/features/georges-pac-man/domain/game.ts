@@ -41,6 +41,7 @@ export type GeorgesPacManState = {
 
 export type GeorgesPacManInput = {
   direction?: Direction;
+  endRunPressed?: boolean;
   restartPressed?: boolean;
   startPressed?: boolean;
 };

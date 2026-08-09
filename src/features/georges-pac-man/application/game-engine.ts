@@ -15,8 +15,8 @@ import {
   positionKey,
 } from "@/features/georges-pac-man/data/maze";
 
-const PLAYER_MOVE_SECONDS = 0.105;
-const GHOST_MOVE_SECONDS = 0.165;
+const PLAYER_MOVE_SECONDS = 0.13;
+const GHOST_MOVE_SECONDS = 0.21;
 const POWER_SECONDS = 8;
 const directions: readonly Direction[] = ["up", "left", "down", "right"];
 const ghostColors = ["#fb7185", "#22d3ee", "#f0abfc", "#fb923c"] as const;
@@ -181,6 +181,9 @@ export function stepGeorgesPacMan(
   input: GeorgesPacManInput = {},
   seconds = GEORGES_PAC_MAN_STEP_SECONDS,
 ): GeorgesPacManState {
+  if (input.endRunPressed && state.phase === "playing") {
+    return { ...state, phase: "lost", status: "Run ended — your score still counts!" };
+  }
   if (input.restartPressed && (state.phase === "lost" || state.phase === "won")) {
     return createInitialGeorgesPacManState();
   }

@@ -37,7 +37,7 @@ function findPath(start: GridPosition, targets: ReadonlySet<string>): Direction[
   return [];
 }
 
-describe("Georges Pac Man game engine", () => {
+describe("George (Pac) Man game engine", () => {
   it("uses a fully connected compact maze with four power pellets", () => {
     const initial = createInitialGeorgesPacManState();
     const reachable = new Set([positionKey(initial.player)]);
@@ -65,7 +65,7 @@ describe("Georges Pac Man game engine", () => {
 
   it("buffers turns, moves George, and eats pellets", () => {
     let state = createInitialGeorgesPacManState();
-    state = stepGeorgesPacMan(state, { direction: "up" }, 0.105);
+    state = stepGeorgesPacMan(state, { direction: "up" }, 0.13);
 
     expect(state.phase).toBe("playing");
     expect(state.player).toMatchObject({ column: 7, row: 7, direction: "up" });
@@ -80,7 +80,7 @@ describe("Georges Pac Man game engine", () => {
       ghosts: [ghost],
       phase: "playing",
       player: { ...initial.player, direction: "left", nextDirection: "left" },
-      playerMoveAccumulator: 0.104,
+      playerMoveAccumulator: 0.129,
       powerSeconds: 4,
     };
     const next = stepGeorgesPacMan(state, {}, 0.001);
@@ -98,7 +98,7 @@ describe("Georges Pac Man game engine", () => {
       ghosts: [{ ...initial.ghosts[0], column: 6, row: 8 }],
       phase: "playing",
       player: { ...initial.player, direction: "left", nextDirection: "left" },
-      playerMoveAccumulator: 0.104,
+      playerMoveAccumulator: 0.129,
     };
     const next = stepGeorgesPacMan(state, {}, 0.001);
 
@@ -115,7 +115,7 @@ describe("Georges Pac Man game engine", () => {
       const path = findPath(state.player, targets);
       expect(path.length).toBeGreaterThan(0);
       for (const direction of path) {
-        state = stepGeorgesPacMan(state, { direction }, 0.105);
+        state = stepGeorgesPacMan(state, { direction }, 0.13);
         moves += 1;
         if (state.phase === "won") break;
       }
@@ -134,5 +134,27 @@ describe("Georges Pac Man game engine", () => {
     );
 
     expect(state).toMatchObject({ phase: "lost", status: "Time’s up — try another route!" });
+  });
+
+  it("buffers an early turn until George reaches the next opening", () => {
+    let state = createInitialGeorgesPacManState();
+    state = stepGeorgesPacMan(state, { direction: "up" }, 0.13);
+    state = stepGeorgesPacMan(state, { direction: "right" }, 0.13);
+
+    expect(state.player).toMatchObject({ column: 7, row: 6, direction: "up", nextDirection: "right" });
+
+    state = stepGeorgesPacMan(state, {}, 0.13);
+    expect(state.player).toMatchObject({ column: 8, row: 6, direction: "right" });
+  });
+
+  it("ends an unfinished run with its current score intact", () => {
+    const playing = { ...createInitialGeorgesPacManState(), phase: "playing" as const, score: 280 };
+    const ended = stepGeorgesPacMan(playing, { endRunPressed: true }, 0);
+
+    expect(ended).toMatchObject({
+      phase: "lost",
+      score: 280,
+      status: "Run ended — your score still counts!",
+    });
   });
 });
