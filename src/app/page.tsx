@@ -19,7 +19,7 @@ export default async function Home() {
           Welcome to Zavi Arcade.
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl">
-          Experience designed by Zavi and built by Zavi and family.
+          Games and experiences designed by Zavi and his friends.
         </p>
       </section>
 

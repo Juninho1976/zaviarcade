@@ -11,7 +11,7 @@ describe("Home", () => {
 
     expect(page).toContain("Welcome to Zavi Arcade.");
     expect(page).toContain(
-      "Experience designed by Zavi and built by Zavi and family.",
+      "Games and experiences designed by Zavi and his friends.",
     );
     expect(page).toContain("Ready to play");
     expect(page).toContain("Mystery Game");
