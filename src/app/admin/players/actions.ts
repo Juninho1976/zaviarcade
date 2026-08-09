@@ -6,6 +6,7 @@ import {
   generateTemporaryPassword,
   isValidDisplayName,
   isValidUsername,
+  MIN_PASSWORD_LENGTH,
   normalizeDisplayName,
   normalizeUsername,
 } from "@/features/auth/application/validation";
@@ -35,7 +36,7 @@ export async function managePlayer(
       if (!isValidDisplayName(displayName)) return { error: "Display name must be 1–24 letters, numbers, spaces, apostrophes or hyphens." };
       const requestedPassword = String(formData.get("password") ?? "");
       const temporaryPassword = requestedPassword || generateTemporaryPassword();
-      if (temporaryPassword.length < 12) return { error: "Temporary passwords must contain at least 12 characters." };
+      if (temporaryPassword.length < MIN_PASSWORD_LENGTH) return { error: `Temporary passwords must contain at least ${MIN_PASSWORD_LENGTH} characters.` };
       await auth.api.createUser({
         body: {
           email: `${crypto.randomUUID()}@players.invalid`,
@@ -74,7 +75,7 @@ export async function managePlayer(
     if (intent === "reset-password") {
       const requestedPassword = String(formData.get("password") ?? "");
       const temporaryPassword = requestedPassword || generateTemporaryPassword();
-      if (temporaryPassword.length < 12) return { error: "Temporary passwords must contain at least 12 characters." };
+      if (temporaryPassword.length < MIN_PASSWORD_LENGTH) return { error: `Temporary passwords must contain at least ${MIN_PASSWORD_LENGTH} characters.` };
       await auth.api.setUserPassword({
         body: { userId, newPassword: temporaryPassword },
         headers: requestHeaders,
