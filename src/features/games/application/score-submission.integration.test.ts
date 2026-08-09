@@ -42,7 +42,12 @@ describe("local D1 score submission", () => {
     expect(result).toMatchObject({ success: true, status: 201 });
     if (!result.success) throw new Error(result.message);
     const leaderboard = await getLeaderboard(proxy.env.DB, "zavi-dash");
-    expect(leaderboard).toContainEqual({ playerName: "Zavi", rank: 1, score: 1_086 });
+    expect(leaderboard).toContainEqual(expect.objectContaining({
+      playerName: "Zavi",
+      rank: 1,
+      score: 1_086,
+      scoredAt: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/),
+    }));
     const stored = await proxy.env.DB.prepare("SELECT id FROM scores WHERE id = ?").bind(result.scoreId).first<{ id: number }>();
     expect(stored?.id).toBe(result.scoreId);
   });

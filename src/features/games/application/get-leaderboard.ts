@@ -1,11 +1,12 @@
 import type { LeaderboardEntry } from "@/features/games/domain/game";
 
-type LeaderboardRow = { playerName: string; rank: number; score: number };
+type LeaderboardRow = LeaderboardEntry;
 type Database = { prepare(query: string): { bind(...values: unknown[]): { all<T>(): Promise<{ results: T[] }> } } };
 
 export async function getLeaderboard(database: Database, slug: string): Promise<readonly LeaderboardEntry[]> {
   const result = await database.prepare(`
     SELECT u.name AS playerName, s.score,
+      strftime('%Y-%m-%dT%H:%M:%SZ', s.created_at) AS scoredAt,
       ROW_NUMBER() OVER (ORDER BY s.score DESC, s.id ASC) AS rank
     FROM scores s
     JOIN games g ON g.id = s.game_id

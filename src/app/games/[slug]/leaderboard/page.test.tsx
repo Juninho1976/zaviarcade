@@ -29,7 +29,12 @@ describe("LeaderboardPage", () => {
   });
 
   it("renders scores returned by D1", async () => {
-    getLeaderboardMock.mockResolvedValue([{ playerName: "Zavi", rank: 1, score: 1_086 }]);
+    getLeaderboardMock.mockResolvedValue([{
+      playerName: "Zavi",
+      rank: 1,
+      scoredAt: "2026-08-09T14:35:00Z",
+      score: 1_086,
+    }]);
 
     const page = await LeaderboardPage({ params: Promise.resolve({ slug: "zavi-dash" }) });
     const markup = renderToStaticMarkup(page);
@@ -37,5 +42,7 @@ describe("LeaderboardPage", () => {
     expect(markup).toContain("Zavi");
     expect(markup).toContain("1,086");
     expect(markup).toContain("#1");
+    expect(markup).toContain("9 Aug 2026, 14:35 UTC");
+    expect(markup).toContain('dateTime="2026-08-09T14:35:00Z"');
   });
 });
