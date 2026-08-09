@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { safeReturnTo } from "@/features/auth/application/validation";
+import { MIN_PASSWORD_LENGTH, safeReturnTo } from "@/features/auth/application/validation";
 import { getAuthenticatedPlayer } from "@/features/auth/server/session";
 import { changeTemporaryPassword } from "./actions";
 
@@ -38,10 +38,10 @@ export default async function ChangePasswordPage({
             <input autoComplete="current-password" className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3" name="currentPassword" required type="password" />
           </label>
           <label className="block font-semibold">New password
-            <input autoComplete="new-password" className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3" minLength={12} name="newPassword" required type="password" />
+            <input autoComplete="new-password" className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3" minLength={MIN_PASSWORD_LENGTH} name="newPassword" required type="password" />
           </label>
           <label className="block font-semibold">Type it again
-            <input autoComplete="new-password" className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3" minLength={12} name="confirmation" required type="password" />
+            <input autoComplete="new-password" className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3" minLength={MIN_PASSWORD_LENGTH} name="confirmation" required type="password" />
           </label>
           <button className="w-full rounded-xl bg-cyan-800 px-5 py-3 font-bold text-white hover:bg-cyan-950" type="submit">Save password and continue</button>
         </form>

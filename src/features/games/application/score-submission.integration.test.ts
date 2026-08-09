@@ -65,6 +65,58 @@ describe("local D1 score submission", () => {
 });
 
 describe("local D1 account authentication", () => {
+  it("lets an administrator create a player with a five-character password and that player sign in", async () => {
+    const auth = createAuth(proxy.env.DB, "test-secret-that-is-at-least-32-characters", true);
+    const adminSignup = await auth.handler(new Request("http://localhost/api/auth/sign-up/email", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        email: "create-player-admin@players.invalid",
+        name: "Create Player Admin",
+        password: "Adm1n",
+        username: "create-player-admin",
+        mustChangePassword: false,
+      }),
+    }));
+    expect(adminSignup.status).toBe(200);
+    const adminUser = await proxy.env.DB.prepare(
+      `SELECT id FROM "user" WHERE username = ?`,
+    ).bind("create-player-admin").first<{ id: string }>();
+    expect(adminUser?.id).toBeTruthy();
+    await proxy.env.DB.prepare(`UPDATE "user" SET role = 'admin' WHERE id = ?`).bind(adminUser!.id).run();
+
+    const adminSignIn = await auth.handler(new Request("http://localhost/api/auth/sign-in/username", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ username: "create-player-admin", password: "Adm1n" }),
+    }));
+    expect(adminSignIn.status).toBe(200);
+    const adminCookie = adminSignIn.headers.get("set-cookie")?.split(";", 1)[0];
+    expect(adminCookie).toBeTruthy();
+
+    await expect(auth.api.createUser({
+      body: {
+        email: "created-player@players.invalid",
+        name: "Created Player",
+        password: "P7ayr",
+        role: "user",
+        data: {
+          username: "created-player",
+          displayUsername: "created-player",
+          mustChangePassword: true,
+        },
+      },
+      headers: new Headers({ cookie: adminCookie! }),
+    })).resolves.toMatchObject({ user: { username: "created-player" } });
+
+    const playerSignIn = await auth.handler(new Request("http://localhost/api/auth/sign-in/username", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ username: "created-player", password: "P7ayr" }),
+    }));
+    expect(playerSignIn.status).toBe(200);
+  });
+
   it("hashes passwords, signs in by username and creates a secure server session", async () => {
     const auth = createAuth(proxy.env.DB, "test-secret-that-is-at-least-32-characters", true);
     const signup = await auth.handler(new Request("http://localhost/api/auth/sign-up/email", {

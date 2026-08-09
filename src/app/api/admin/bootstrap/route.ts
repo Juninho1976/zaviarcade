@@ -4,6 +4,7 @@ import { createAuth } from "@/features/auth/server/auth";
 import {
   isValidDisplayName,
   isValidUsername,
+  MIN_PASSWORD_LENGTH,
   normalizeDisplayName,
   normalizeUsername,
 } from "@/features/auth/application/validation";
@@ -35,9 +36,9 @@ export async function POST(request: Request) {
   const username = typeof body.username === "string" ? normalizeUsername(body.username) : "";
   const displayName = typeof body.displayName === "string" ? normalizeDisplayName(body.displayName) : "";
   const password = typeof body.password === "string" ? body.password : "";
-  if (!isValidUsername(username) || !isValidDisplayName(displayName) || password.length < 12) {
+  if (!isValidUsername(username) || !isValidDisplayName(displayName) || password.length < MIN_PASSWORD_LENGTH) {
     return NextResponse.json(
-      { error: "Use a valid username, display name and password of at least 12 characters." },
+      { error: `Use a valid username, display name and password of at least ${MIN_PASSWORD_LENGTH} characters.` },
       { status: 400 },
     );
   }

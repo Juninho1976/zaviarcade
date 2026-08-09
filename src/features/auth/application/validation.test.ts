@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  generateTemporaryPassword,
   isValidDisplayName,
   isValidUsername,
   normalizeDisplayName,
@@ -26,5 +27,9 @@ describe("player identity validation", () => {
     expect(safeReturnTo("https://example.com")).toBe("/");
     expect(safeReturnTo("//example.com")).toBe("/");
     expect(safeReturnTo("/\\example.com")).toBe("/");
+  });
+
+  it("generates readable five-character temporary passwords", () => {
+    expect(generateTemporaryPassword()).toMatch(/^[A-HJ-NP-Za-km-z2-9]{5}$/);
   });
 });

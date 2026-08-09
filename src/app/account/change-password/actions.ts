@@ -3,7 +3,7 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { safeReturnTo } from "@/features/auth/application/validation";
+import { MIN_PASSWORD_LENGTH, safeReturnTo } from "@/features/auth/application/validation";
 import {
   AccountCompletionError,
   completeTemporaryPasswordChange,
@@ -17,7 +17,7 @@ export async function changeTemporaryPassword(formData: FormData) {
   const newPassword = String(formData.get("newPassword") ?? "");
   const confirmation = String(formData.get("confirmation") ?? "");
   const returnTo = safeReturnTo(String(formData.get("returnTo") ?? "/"));
-  if (newPassword.length < 12 || newPassword !== confirmation) {
+  if (newPassword.length < MIN_PASSWORD_LENGTH || newPassword !== confirmation) {
     redirect(`/account/change-password?returnTo=${encodeURIComponent(returnTo)}&error=invalid`);
   }
   try {

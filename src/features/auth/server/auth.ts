@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { admin, username } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
+import { MIN_PASSWORD_LENGTH } from "@/features/auth/application/validation";
 
 const developmentSecret = "zavi-arcade-local-development-secret-change-me";
 
@@ -20,7 +21,7 @@ export function createAuth(database: D1Database, secret?: string, allowSignUp = 
     emailAndPassword: {
       enabled: true,
       disableSignUp: !allowSignUp,
-      minPasswordLength: 12,
+      minPasswordLength: MIN_PASSWORD_LENGTH,
       maxPasswordLength: 128,
     },
     user: {

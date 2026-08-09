@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import type { ManagedPlayer } from "@/features/auth/server/admin";
 import { managePlayer, type AdminActionState } from "@/app/admin/players/actions";
+import { MIN_PASSWORD_LENGTH } from "@/features/auth/application/validation";
 
 const initialState: AdminActionState = {};
 
@@ -26,7 +27,7 @@ export function AdminPlayerManager({ players }: { players: ManagedPlayer[] }) {
     <>
       <section className="mt-8 rounded-3xl border border-cyan-100 bg-white p-6 shadow-sm sm:p-8" aria-labelledby="create-player">
         <h2 className="text-2xl font-black text-slate-950" id="create-player">Create a player</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-600">Use nicknames, not full legal names. Leave the password blank to generate a strong one.</p>
+        <p className="mt-2 text-sm leading-6 text-slate-600">Use nicknames, not full legal names. Leave the password blank to generate a five-character temporary password.</p>
         <form action={action} className="mt-6 grid gap-4 sm:grid-cols-2">
           <input name="intent" type="hidden" value="create" />
           <label className="font-semibold">Username
@@ -36,7 +37,7 @@ export function AdminPlayerManager({ players }: { players: ManagedPlayer[] }) {
             <input className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 font-normal" name="displayName" required />
           </label>
           <label className="font-semibold sm:col-span-2">Temporary password (optional)
-            <input autoComplete="new-password" className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 font-normal" minLength={12} name="password" type="password" />
+            <input autoComplete="new-password" className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 font-normal" minLength={MIN_PASSWORD_LENGTH} name="password" type="password" />
           </label>
           <button className="rounded-xl bg-cyan-800 px-5 py-3 font-bold text-white disabled:opacity-60 sm:col-span-2" disabled={pending} type="submit">
             {pending ? "Saving…" : "Create player account"}
