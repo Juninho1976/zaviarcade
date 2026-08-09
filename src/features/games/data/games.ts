@@ -55,8 +55,8 @@ export const games: readonly Game[] = [
   },
   {
     slug: "georges-pac-man",
-    title: "Georges Pac Man",
-    description: "A cheerful two-minute maze chase inspired by Zavi’s friend Georges.",
+    title: "George (Pac) Man",
+    description: "A cheerful two-minute maze chase inspired by Zavi’s friend George.",
     status: "live",
     isPlaceholder: false,
     legacySlugs: [],

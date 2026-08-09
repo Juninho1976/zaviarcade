@@ -38,7 +38,7 @@ describe("submitScore", () => {
     });
   });
 
-  it("accepts Georges Pac Man scores within its two-minute game ceiling", () => {
+  it("accepts George (Pac) Man scores within its two-minute game ceiling", () => {
     expect(submitScore("georges-pac-man", { score: 12_340, submissionId })).toEqual({
       success: true,
       submission: { score: 12_340, submissionId },

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createInitialGeorgesPacManState, stepGeorgesPacMan } from "@/features/georges-pac-man/application/game-engine";
+import { submitGeorgePacManScore } from "@/features/georges-pac-man/application/score-submission-client";
 import { georgesPacManMaze } from "@/features/georges-pac-man/data/maze";
 import {
   GEORGES_PAC_MAN_DURATION_SECONDS,
@@ -123,7 +124,11 @@ function drawGame(context: CanvasRenderingContext2D, state: GeorgesPacManState):
     context.textAlign = "center";
     context.fillStyle = state.phase === "won" ? "#86efac" : state.phase === "lost" ? "#fda4af" : "#fef08a";
     context.font = "900 32px system-ui";
-    context.fillText(state.phase === "won" ? "MAZE CLEARED!" : state.phase === "lost" ? "GAME OVER" : "READY, GEORGE?", width / 2, 315);
+    context.fillText(
+      state.phase === "won" ? "MAZE CLEARED!" : state.status.startsWith("Run ended") ? "RUN FINISHED!" : state.phase === "lost" ? "GAME OVER" : "READY, GEORGE?",
+      width / 2,
+      315,
+    );
     context.fillStyle = "white";
     context.font = "700 18px system-ui";
     context.fillText(state.phase === "ready" ? "Swipe or choose a direction" : state.status, width / 2, 355);
@@ -139,14 +144,20 @@ function directionFromKey(code: string): Direction | undefined {
   return undefined;
 }
 
+type ScoreSaveState =
+  | { status: "idle" }
+  | { status: "pending" }
+  | { status: "success"; scoreId: number }
+  | { status: "error"; message: string };
+
 export function GeorgesPacManGame({ playerDisplayName }: { playerDisplayName: string }) {
   const [state, setState] = useState(createInitialGeorgesPacManState);
   const [muted, setMuted] = useState(false);
-  const [saveMessage, setSaveMessage] = useState("");
+  const [scoreSave, setScoreSave] = useState<ScoreSaveState>({ status: "idle" });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef(state);
   const inputRef = useRef<Direction | undefined>(undefined);
-  const submittedRef = useRef(false);
+  const submissionIdRef = useRef<string | null>(null);
   const audioRef = useRef<GeorgesPacManAudio | null>(null);
   const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
 
@@ -156,12 +167,33 @@ export function GeorgesPacManGame({ playerDisplayName }: { playerDisplayName: st
   }, []);
 
   const reset = useCallback(() => {
-    submittedRef.current = false;
+    submissionIdRef.current = null;
     inputRef.current = undefined;
-    setSaveMessage("");
+    setScoreSave({ status: "idle" });
     stateRef.current = createInitialGeorgesPacManState();
     setState(stateRef.current);
   }, []);
+
+  const saveScore = useCallback(async (score: number) => {
+    setScoreSave({ status: "pending" });
+    submissionIdRef.current ??= crypto.randomUUID();
+    try {
+      const scoreId = await submitGeorgePacManScore(score, submissionIdRef.current);
+      setScoreSave({ status: "success", scoreId });
+    } catch (error) {
+      setScoreSave({
+        status: "error",
+        message: error instanceof Error ? error.message : "Your score could not be saved. Please try again.",
+      });
+    }
+  }, []);
+
+  const endAndSaveRun = useCallback(() => {
+    stateRef.current = stepGeorgesPacMan(stateRef.current, { endRunPressed: true }, 0);
+    setState(stateRef.current);
+    audioRef.current?.stopMusic();
+    void saveScore(stateRef.current.score);
+  }, [saveScore]);
 
   useEffect(() => {
     audioRef.current = createGeorgesPacManAudio();
@@ -215,6 +247,7 @@ export function GeorgesPacManGame({ playerDisplayName }: { playerDisplayName: st
         if (stateRef.current.phase !== previous.phase && (stateRef.current.phase === "won" || stateRef.current.phase === "lost")) {
           audioRef.current?.stopMusic();
           if (stateRef.current.phase === "won") audioRef.current?.playVictory();
+          void saveScore(stateRef.current.score);
         }
         accumulator -= GEORGES_PAC_MAN_STEP_SECONDS;
       }
@@ -224,20 +257,7 @@ export function GeorgesPacManGame({ playerDisplayName }: { playerDisplayName: st
     };
     frame = requestAnimationFrame(tick);
     return () => { cancelAnimationFrame(frame); observer?.disconnect(); };
-  }, []);
-
-  useEffect(() => {
-    if ((state.phase !== "won" && state.phase !== "lost") || submittedRef.current) return;
-    submittedRef.current = true;
-    void fetch("/api/games/georges-pac-man/scores", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ score: state.score, submissionId: crypto.randomUUID() }),
-    }).then((response) => response.ok
-      ? setSaveMessage("Score saved to the leaderboard!")
-      : setSaveMessage("Your score could not be saved."))
-      .catch(() => setSaveMessage("Your score could not be saved."));
-  }, [state.phase, state.score]);
+  }, [saveScore]);
 
   const remaining = Math.max(0, Math.ceil(GEORGES_PAC_MAN_DURATION_SECONDS - state.elapsedSeconds));
   const pelletsLeft = state.pellets.length + state.powerPellets.length;
@@ -248,7 +268,7 @@ export function GeorgesPacManGame({ playerDisplayName }: { playerDisplayName: st
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-sm font-semibold tracking-[0.2em] text-cyan-700 uppercase">Playable game</p>
-          <h2 id="georges-pac-man-play-heading" className="mt-2 text-3xl font-bold text-slate-950">Clear George’s maze!</h2>
+          <h2 id="georges-pac-man-play-heading" className="mt-2 text-3xl font-bold text-slate-950">Clear the maze with George Man!</h2>
         </div>
         <p className="rounded-full bg-indigo-100 px-4 py-2 text-sm font-black text-indigo-950">{remaining}s left</p>
       </div>
@@ -264,7 +284,7 @@ export function GeorgesPacManGame({ playerDisplayName }: { playerDisplayName: st
         <canvas
           ref={canvasRef}
           aria-describedby="georges-pac-man-status"
-          aria-label="Georges Pac Man maze. Swipe, use the on-screen arrows, or press the arrow or WASD keys to move."
+          aria-label="George (Pac) Man maze. Swipe, use the on-screen arrows, or press the arrow or WASD keys to move."
           className="block aspect-square w-full touch-none rounded-3xl border-4 border-indigo-950 bg-slate-950 shadow-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-500"
           height={GEORGES_PAC_MAN_VIEWPORT.height}
           onPointerDown={(event) => {
@@ -297,15 +317,30 @@ export function GeorgesPacManGame({ playerDisplayName }: { playerDisplayName: st
           <button className="mx-auto mt-4 block rounded-xl border border-slate-300 px-4 py-2 font-bold text-slate-700" onClick={() => setMuted((current) => !current)} type="button">
             Sound: {muted ? "Off" : "On"}
           </button>
+          {state.phase === "playing" && state.score > 0 ? (
+            <button className="mx-auto mt-3 block rounded-xl bg-amber-300 px-4 py-2 font-bold text-amber-950" onClick={endAndSaveRun} type="button">
+              End run &amp; save score
+            </button>
+          ) : null}
         </div>
       </div>
       <p id="georges-pac-man-status" aria-live="polite" className="mt-4 text-center font-semibold text-indigo-950">{state.status}</p>
       {state.phase === "won" || state.phase === "lost" ? (
         <div className="mt-6 rounded-2xl bg-indigo-950 p-6 text-white">
-          <h3 className="text-2xl font-black">{state.phase === "won" ? "Brilliant — maze cleared!" : "Good chase — try again!"}</h3>
-          <p className="mt-2">Final score: {state.score.toLocaleString()}. {saveMessage || "Saving your score…"}</p>
+          <h3 className="text-2xl font-black">
+            {state.phase === "won" ? "Brilliant — maze cleared!" : state.status.startsWith("Run ended") ? "Run finished — your score counts!" : "Good chase — try again!"}
+          </h3>
+          <p className="mt-2">Final score: {state.score.toLocaleString()}.</p>
+          {scoreSave.status === "pending" || scoreSave.status === "idle" ? <p className="mt-2">Saving your score…</p> : null}
+          {scoreSave.status === "success" ? <p className="mt-2 text-green-200">Score #{scoreSave.scoreId} saved to the leaderboard!</p> : null}
+          {scoreSave.status === "error" ? (
+            <div className="mt-3" role="alert">
+              <p className="text-rose-200">{scoreSave.message}</p>
+              <button className="mt-3 rounded-xl bg-white px-4 py-2 font-bold text-indigo-950" onClick={() => void saveScore(state.score)} type="button">Try saving again</button>
+            </div>
+          ) : null}
           <div className="mt-5 flex flex-wrap gap-3">
-            <button className="rounded-xl bg-yellow-300 px-5 py-3 font-black text-indigo-950" onClick={reset} type="button">Play again</button>
+            <button className="rounded-xl bg-yellow-300 px-5 py-3 font-black text-indigo-950 disabled:cursor-wait disabled:opacity-60" disabled={scoreSave.status === "pending"} onClick={reset} type="button">Play again</button>
             <Link className="rounded-xl border border-white/40 px-5 py-3 font-bold" href="/games/georges-pac-man/leaderboard">View leaderboard</Link>
           </div>
         </div>

@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
-  <title id="title">Georges Pac Man</title>
+  <title id="title">George (Pac) Man</title>
   <desc id="desc">A glowing yellow maze hero chases colourful ghosts through a bright blue arcade maze.</desc>
   <defs>
     <linearGradient id="background" x2="1" y2="1">
@@ -38,5 +38,5 @@
     <g fill="white"><ellipse cx="-15" cy="-4" rx="11" ry="14"/><ellipse cx="15" cy="-4" rx="11" ry="14"/></g>
     <g fill="#172554"><circle cx="-12" cy="0" r="5"/><circle cx="18" cy="0" r="5"/></g>
   </g>
-  <text x="600" y="625" text-anchor="middle" font-family="system-ui, sans-serif" font-size="62" font-weight="900" fill="white">GEORGES PAC MAN</text>
+  <text x="600" y="625" text-anchor="middle" font-family="system-ui, sans-serif" font-size="62" font-weight="900" fill="white">GEORGE (PAC) MAN</text>
 </svg>

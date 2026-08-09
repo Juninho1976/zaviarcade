@@ -17,7 +17,7 @@ async function ensureAdminAndLogin(page: import("@playwright/test").Page) {
   expect(login.ok()).toBe(true);
 }
 
-test.describe("Georges Pac Man player journey", () => {
+test.describe("George (Pac) Man player journey", () => {
   test.beforeEach(async ({ page }) => {
     await ensureAdminAndLogin(page);
   });
@@ -25,7 +25,7 @@ test.describe("Georges Pac Man player journey", () => {
   test("starts with large on-screen controls without horizontal overflow", async ({ page }) => {
     await page.goto("/games/georges-pac-man");
     await expect(page.getByText(`Playing as ${admin.displayName}`)).toBeVisible();
-    const canvas = page.getByRole("img", { name: /Georges Pac Man maze/i });
+    const canvas = page.getByRole("img", { name: /George \(Pac\) Man maze/i });
     await expect(canvas).toBeVisible();
 
     for (const name of ["Move up", "Move left", "Move down", "Move right"]) {
@@ -47,5 +47,39 @@ test.describe("Georges Pac Man player journey", () => {
     await page.goto("/games/georges-pac-man");
     await page.keyboard.press("ArrowUp");
     await expect(page.locator("#georges-pac-man-status")).toContainText("Clear every pellet");
+  });
+
+  test("saves an unfinished run and confirms its leaderboard score", async ({ page }) => {
+    await page.route("**/api/games/georges-pac-man/scores", async (route) => {
+      await route.fulfill({
+        status: 201,
+        contentType: "application/json",
+        body: JSON.stringify({ scoreId: 73 }),
+      });
+    });
+    await page.goto("/games/georges-pac-man");
+    await page.getByRole("button", { name: "Move up" }).click();
+    await expect(page.getByRole("button", { name: "End run & save score" })).toBeVisible();
+    await page.getByRole("button", { name: "End run & save score" }).click();
+
+    await expect(page.getByRole("heading", { name: "Run finished — your score counts!" })).toBeVisible();
+    await expect(page.getByText("Score #73 saved to the leaderboard!")).toBeVisible();
+  });
+
+  test("shows a useful migration error and lets the player retry saving", async ({ page }) => {
+    await page.route("**/api/games/georges-pac-man/scores", async (route) => {
+      await route.fulfill({
+        status: 404,
+        contentType: "application/json",
+        body: JSON.stringify({ error: "Game not found." }),
+      });
+    });
+    await page.goto("/games/georges-pac-man");
+    await page.getByRole("button", { name: "Move up" }).click();
+    await page.getByRole("button", { name: "End run & save score" }).click();
+
+    await expect(page.getByRole("region", { name: "Clear the maze with George Man!" }).getByRole("alert"))
+      .toContainText("apply the latest database migration");
+    await expect(page.getByRole("button", { name: "Try saving again" })).toBeVisible();
   });
 });
