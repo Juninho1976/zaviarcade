@@ -4,6 +4,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getGameByLegacySlug } from "@/features/games/application/get-game-by-legacy-slug";
 import { getGameBySlug } from "@/features/games/application/get-game-by-slug";
 import { getLeaderboard } from "@/features/games/application/get-leaderboard";
+import { formatScoreDate } from "@/features/games/application/format-score-date";
 import { games } from "@/features/games/data/games";
 
 export function generateStaticParams() {
@@ -54,6 +55,7 @@ export default async function LeaderboardPage({
               <tr>
                 <th className="px-5 py-4 font-semibold" scope="col">Rank</th>
                 <th className="px-5 py-4 font-semibold" scope="col">Player</th>
+                <th className="px-5 py-4 font-semibold" scope="col">Scored</th>
                 <th className="px-5 py-4 text-right font-semibold" scope="col">Score</th>
               </tr>
             </thead>
@@ -62,6 +64,9 @@ export default async function LeaderboardPage({
                 <tr className="border-b border-slate-100 last:border-0" key={entry.rank}>
                   <td className="px-5 py-4 font-bold text-cyan-800">#{entry.rank}</td>
                   <td className="px-5 py-4 font-semibold text-slate-950">{entry.playerName}</td>
+                  <td className="px-5 py-4 text-sm whitespace-nowrap text-slate-600">
+                    <time dateTime={entry.scoredAt}>{formatScoreDate(entry.scoredAt)}</time>
+                  </td>
                   <td className="px-5 py-4 text-right font-mono font-semibold text-slate-700">{entry.score.toLocaleString()}</td>
                 </tr>
               ))}

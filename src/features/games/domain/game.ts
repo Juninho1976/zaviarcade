@@ -4,6 +4,7 @@ export type GameStatus = "coming-soon" | "live";
 export type LeaderboardEntry = {
   playerName: string;
   rank: number;
+  scoredAt: string;
   score: number;
 };
 

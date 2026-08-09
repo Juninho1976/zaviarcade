@@ -3,7 +3,15 @@ import { getLeaderboard } from "./get-leaderboard";
 
 describe("getLeaderboard", () => {
   it("queries the game leaderboard and returns ranked D1 rows", async () => {
-    const prepare = () => ({ bind: () => ({ all: async () => ({ results: [{ playerName: "Zavi", rank: 1, score: 99 }] }) }) });
-    await expect(getLeaderboard({ prepare }, "zavi-dash")).resolves.toEqual([{ playerName: "Zavi", rank: 1, score: 99 }]);
+    let query = "";
+    const row = { playerName: "Zavi", rank: 1, scoredAt: "2026-08-09T14:35:00Z", score: 99 };
+    const prepare = (statement: string) => {
+      query = statement;
+      return { bind: () => ({ all: async () => ({ results: [row] }) }) };
+    };
+
+    await expect(getLeaderboard({ prepare }, "zavi-dash")).resolves.toEqual([row]);
+    expect(query).toContain("s.created_at");
+    expect(query).toContain("AS scoredAt");
   });
 });
