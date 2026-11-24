@@ -1,7 +1,7 @@
 {
 	"$schema": "./node_modules/wrangler/config-schema.json",
 	"name": "zaviarcade",
-	"main": ".open-next/worker.js",
+	"main": "worker.js",
 	"compatibility_date": "2026-07-17",
 	"compatibility_flags": [
 		"nodejs_compat"
