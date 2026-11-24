@@ -7,7 +7,7 @@ describe("getLeaderboard", () => {
     const row = { playerName: "Zavi", rank: 1, scoredAt: "2026-08-09T14:35:00Z", score: 99 };
     const prepare = (statement: string) => {
       query = statement;
-      return { bind: () => ({ all: async () => ({ results: [row] }) }) };
+      return { bind: () => ({ all: async <T,>() => ({ results: [row] as T[] }) }) };
     };
 
     await expect(getLeaderboard({ prepare }, "zavi-dash")).resolves.toEqual([row]);

@@ -18,8 +18,11 @@ export async function getAuthForRequest() {
 }
 
 export async function getSession() {
+  const requestHeaders = await headers();
+  // No cookie means there is no browser session to validate.
+  if (!requestHeaders.get("cookie")) return null;
   const auth = await getAuthForRequest();
-  return auth.api.getSession({ headers: await headers() });
+  return auth.api.getSession({ headers: requestHeaders });
 }
 
 function toPlayer(user: SessionUser): AuthenticatedPlayer | null {

@@ -4,7 +4,7 @@ import { processScoreSubmission } from "./process-score-submission";
 const database = {
   prepare: () => ({
     bind: (...values: unknown[]) => ({
-      all: async () => ({ results: values[0] === "zavi-dash" ? [{ id: 1 }] : [{ id: 2 }], meta: {} }),
+      all: async <T,>() => ({ results: (values[0] === "zavi-dash" ? [{ id: 1 }] : [{ id: 2 }]) as T[], meta: {} }),
       run: async () => ({ results: [], meta: { last_row_id: 7 } }),
     }),
   }),

@@ -29,6 +29,18 @@ After deployment, call `POST /api/admin/bootstrap` once as documented in the REA
 
 ## Local commands
 
+### Scan traffic protection
+
+Wrangler starts at `worker.js`, which rejects PHP, WordPress-internal and sensitive
+dotfile probes with an empty 404 before loading the generated OpenNext handler.
+Normal routes, assets and `.well-known` requests retain their existing behaviour.
+Requests without cookies also skip browser-session authentication setup.
+
+After deployment, check a known probe such as `/.trash7206/index.php` returns an
+empty 404, and smoke-test home, login, game, leaderboard and score submission.
+Do not edit the generated `.open-next/worker.js` file directly.
+
+
 ```bash
 npm run dev
 npm run preview
